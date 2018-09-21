@@ -90,7 +90,12 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  deleteDistrict(district: any): void {
+    this.districtList.splice(this.districtList.indexOf(district), 1);
+  }
+
   saveDistricts(): void {
+    this.districtList = this.districtList.filter(district => district.name && district.uid);
     this.localStorage.setItem('districtList', this.districtList).subscribe(res => {
       if (res) {
         let manageDistrictModel = this.manageDistrictModel.nativeElement;
