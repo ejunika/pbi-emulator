@@ -14,6 +14,9 @@ export class HeaderComponent implements OnInit {
   @Output('onClickUpdateUsername')
   onClickUpdateUsername: EventEmitter<void> = new EventEmitter<void>();
 
+  @Output('onClickManageDistrict')
+  onClickManageDistrict: EventEmitter<void> = new EventEmitter<void>();
+
   constructor() { }
 
   ngOnInit() {
@@ -29,7 +32,7 @@ export class HeaderComponent implements OnInit {
   }
 
   openMangeDistrictModal(): void {
-
+    this.onClickManageDistrict.emit();
   }
 
 }

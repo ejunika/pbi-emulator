@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import * as $ from 'jquery';
 import 'bootstrap';
 import { LocalStorage } from '@ngx-pwa/local-storage';
@@ -19,12 +19,17 @@ export class HomeComponent implements OnInit {
   @ViewChild('manageAccount')
   manageAccountModel: ElementRef;
 
+  @ViewChild('manageDistrict')
+  manageDistrictModel: ElementRef;
+
   @ViewChild('leftPanel')
   leftPanel: LeftpanelComponent;
 
   azureAccessToken: string = '';
 
   username: string = '';
+
+  districtList: Array<any>;
 
   constructor(
     private localStorage: LocalStorage,
@@ -55,6 +60,16 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  openManageDistrictModal(): void {
+    let manageDistrictModel = this.manageDistrictModel.nativeElement;
+    this.localStorage.getItem('districtList').subscribe(districtMap => {
+      this.districtList = districtMap || [];
+      if (manageDistrictModel) {
+        $(manageDistrictModel).modal('show');
+      }
+    });
+  }
+
   saveUsername(): void {
     this.username = this.username.trim();
     this.localStorage.setItem('username', this.username).subscribe(res => {
@@ -64,6 +79,25 @@ export class HomeComponent implements OnInit {
           $(manageAccountModel).modal('hide');
           this.toasterService.pop('success', 'Account', 'Account updated successfully');
         }
+      }
+    });
+  }
+
+  addMore(): void {
+    this.districtList.push({
+      name: '',
+      uid: ''
+    });
+  }
+
+  saveDistricts(): void {
+    this.localStorage.setItem('districtList', this.districtList).subscribe(res => {
+      if (res) {
+        let manageDistrictModel = this.manageDistrictModel.nativeElement;
+        if (manageDistrictModel) {
+          $(manageDistrictModel).modal('hide');
+        }
+        this.toasterService.pop('success', 'Manage District', 'District list updated');
       }
     });
   }
