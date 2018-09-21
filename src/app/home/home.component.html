@@ -1,0 +1,54 @@
+<app-header (onClickUpdateUsername)="openManageAccountModal()" (onClickRefreshToken)="openRefreshTokenModal()"></app-header>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-2">
+            <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
+        </div>
+        <div class="col-10">
+            <app-mainpanel #mainPanel></app-mainpanel>
+        </div>
+    </div>
+    <div #refreshToken class="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Manage Token</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="exampleTextarea">Azure Access Token</label>
+                            <textarea name="azureAccessToken" data-gramm_editor="false" spellcheck="false" [(ngModel)]="azureAccessToken"
+                                class="form-control" id="azureAccessToken" rows="10"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button (click)="saveAzureToken()" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div #manageAccount class="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Manage Account</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
+                                placeholder="Username">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button (click)="saveUsername()" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <toaster-container></toaster-container>
+</div>
