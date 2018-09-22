@@ -32,6 +32,8 @@ export class AuthInterceptorService implements HttpInterceptor {
               return this.handle401(request, next);
             case 403:
               return this.handle403(request, next);
+            case 500:
+              return this.handle500(request, next);
             default:
               return next.handle(clonedRequest);
           }
@@ -43,11 +45,17 @@ export class AuthInterceptorService implements HttpInterceptor {
   }
 
   handle401(request: HttpRequest<any>, next: HttpHandler) {
+    this.toasterService.pop('error', 'Authentication', 'Un Authorized token');
     return next.handle(request);
   }
 
   handle403(request: HttpRequest<any>, next: HttpHandler) {
-    this.toasterService.pop('error', 'Token', 'Token expired');
+    this.toasterService.pop('error', 'Token', 'Invalid Access Token');
+    return next.handle(request);
+  }
+
+  handle500(request: HttpRequest<any>, next: HttpHandler) {
+    this.toasterService.pop('error', 'Server', 'Internal Server Error');
     return next.handle(request);
   }
 

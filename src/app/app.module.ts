@@ -16,6 +16,7 @@ import { MainpanelComponent } from './mainpanel/mainpanel.component';
 import { AppRoutingModule } from './app-routing.module';
 import { LoginComponent } from './login/login.component';
 import { GroupService } from './group.service';
+import { HelpComponent } from './help/help.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { GroupService } from './group.service';
     HeaderComponent,
     LeftpanelComponent,
     MainpanelComponent,
-    LoginComponent
+    LoginComponent,
+    HelpComponent
   ],
   imports: [
     BrowserModule,

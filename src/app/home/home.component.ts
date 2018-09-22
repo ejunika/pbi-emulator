@@ -29,6 +29,8 @@ export class HomeComponent implements OnInit {
 
   username: string = '';
 
+  showHelpOnStart: boolean;
+
   districtList: Array<any>;
 
   constructor(
@@ -37,7 +39,15 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.localStorage.getItem('dontShowNextTime').subscribe(dontShowNextTime => {
+      this.showHelpOnStart = !dontShowNextTime;
+    });
+  }
 
+  onChangeShowHelpOnStart(): void {
+    this.localStorage.setItem('dontShowNextTime', !this.showHelpOnStart).subscribe(res => {
+
+    });
   }
 
   openRefreshTokenModal(): void {

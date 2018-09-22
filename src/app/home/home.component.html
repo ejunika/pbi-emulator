@@ -3,10 +3,10 @@
 </app-header>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-2">
+        <div class="col-lg-2 col-md-2 col-sm-12">
             <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
         </div>
-        <div class="col-10">
+        <div class="col-lg-10 col-md-10 col-sm-12">
             <app-mainpanel #mainPanel></app-mainpanel>
         </div>
     </div>
@@ -43,6 +43,13 @@
                             <label for="username">Username</label>
                             <input name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
                                 placeholder="Username">
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input (change)="onChangeShowHelpOnStart()" name="showHelpOnStart" [(ngModel)]="showHelpOnStart" type="checkbox" class="custom-control-input"
+                                    id="showHelpOnStart">
+                                <label class="custom-control-label" for="showHelpOnStart">Show help on start</label>
+                            </div>
                         </div>
                     </form>
                 </div>
