@@ -19,10 +19,12 @@ export class HeaderComponent implements OnInit {
 
   reportExpiresIn: string;
 
+  interval: any;
+
   constructor() { }
 
   ngOnInit() {
-    this.reportExpiresIn = 'hh:mm:ss';
+    this.reportExpiresIn = '00:00:00';
   }
 
   openMangeAccountModal(): void {
@@ -40,9 +42,17 @@ export class HeaderComponent implements OnInit {
   onCountdownStart(countdownSeconds): void {
     countdownSeconds = parseInt(countdownSeconds);
     this.reportExpiresIn = this.hhmmss(0);
-    setInterval(() => {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    this.interval = setInterval(() => {
       --countdownSeconds;
-      this.reportExpiresIn = this.hhmmss(countdownSeconds);
+      if (countdownSeconds > 0) {
+        this.reportExpiresIn = this.hhmmss(countdownSeconds);
+      } else {
+        this.reportExpiresIn = this.hhmmss(0);
+        clearInterval(this.interval);
+      }
     }, 1000);
   }
 
