@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, EventEmitter, Output } from '@angular/core';
 import { service, factories, models, Report } from 'powerbi-client';
 import { parse } from 'papaparse';
 import { DataService } from '../data.service';
@@ -15,7 +15,12 @@ export class MainpanelComponent implements OnInit {
   @ViewChild('pbiContainer')
   pbiContainer: ElementRef;
 
+  @Output('onCountdownStart')
+  onCountdownStart: EventEmitter<number> = new EventEmitter<number>();
+
   selectedStudents: Array<any>;
+
+  countDownSeconds: number;
 
   constructor(
     private dataService: DataService,
@@ -86,6 +91,11 @@ export class MainpanelComponent implements OnInit {
         ]
       }
       this.dataService.post(reqData, 'myorg', ['groups', groupId, 'reports', reportId, 'GenerateToken']).subscribe((res) => {
+        let currentISO = new Date().toISOString();
+        let currentTime = Date.parse(currentISO);
+        let expiration = Date.parse(res.expiration);
+        let countdownSeconds = (expiration - currentTime) / 1000;
+        this.onCountdownStart.emit(countdownSeconds);
         const config: IEmbedConfigurationBase = {
           type: 'report',
           accessToken: res.token,

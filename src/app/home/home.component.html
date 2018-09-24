@@ -1,4 +1,4 @@
-<app-header (onClickUpdateUsername)="openManageAccountModal()" (onClickManageDistrict)="openManageDistrictModal()"
+<app-header #header (onClickUpdateUsername)="openManageAccountModal()" (onClickManageDistrict)="openManageDistrictModal()"
     (onClickRefreshToken)="openRefreshTokenModal()">
 </app-header>
 <div class="container-fluid">
@@ -7,7 +7,7 @@
             <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
         </div>
         <div class="col-lg-10 col-md-10 col-sm-12">
-            <app-mainpanel #mainPanel></app-mainpanel>
+            <app-mainpanel (onCountdownStart)="header.onCountdownStart($event)" #mainPanel></app-mainpanel>
         </div>
     </div>
     <div #refreshToken class="modal">

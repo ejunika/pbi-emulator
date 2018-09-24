@@ -17,10 +17,12 @@ export class HeaderComponent implements OnInit {
   @Output('onClickManageDistrict')
   onClickManageDistrict: EventEmitter<void> = new EventEmitter<void>();
 
+  reportExpiresIn: string;
+
   constructor() { }
 
   ngOnInit() {
-
+    this.reportExpiresIn = 'hh:mm:ss';
   }
 
   openMangeAccountModal(): void {
@@ -33,6 +35,27 @@ export class HeaderComponent implements OnInit {
 
   openMangeDistrictModal(): void {
     this.onClickManageDistrict.emit();
+  }
+
+  onCountdownStart(countdownSeconds): void {
+    countdownSeconds = parseInt(countdownSeconds);
+    this.reportExpiresIn = this.hhmmss(0);
+    setInterval(() => {
+      --countdownSeconds;
+      this.reportExpiresIn = this.hhmmss(countdownSeconds);
+    }, 1000);
+  }
+
+  pad(num) {
+    return ("0" + num).slice(-2);
+  }
+
+  hhmmss(secs) {
+    var minutes = Math.floor(secs / 60);
+    secs = secs % 60;
+    var hours = Math.floor(minutes / 60)
+    minutes = minutes % 60;
+    return this.pad(hours) + ":" + this.pad(minutes) + ":" + this.pad(secs);
   }
 
 }
