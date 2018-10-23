@@ -1,23 +1,27 @@
 <form class="mt-2">
     <div class="form-group">
-        <label for="exampleSelect1">Select District</label>
-        <select [disabled]="disableDistrictSelector" name="districtSelector" class="form-control" [(ngModel)]="selectedGroup" (ngModelChange)="onChangeGroup($event)">
-            <option *ngFor="let group of groups" [ngValue]="group">
-                {{group.tanentName || group.name}}
-            </option>
-        </select>
+        <ez-dropdown [ddItems]="groups"
+            [vpn]="'tanentName'"
+            [uidpn]="'id'"
+            [ddlText]="'Select District'"
+            [selectedItem]="selectedGroup"
+            (onItemChange)="selectGroup($event)"
+            [ddConfig]="{searchable: true, disabled: disableDistrictSelector}">
+        </ez-dropdown>
     </div>
     <div class="form-group">
-        <label for="exampleSelect1">Select Dashboard</label>
-        <select [disabled]="disableDashboardSelector" name="dashboardSelector" class="form-control" [(ngModel)]="selectedReport">
-            <option *ngFor="let report of reports" [ngValue]="report">
-                {{report.name}}
-            </option>
-        </select>
+        <ez-dropdown [ddItems]="reports"
+            [vpn]="'name'"
+            [uidpn]="'id'"
+            [selectedItem]="selectedReport"
+            (onItemChange)="selectReport($event)"
+            [ddlText]="'Select Report'"
+            [ddConfig]="{ searchable: true, disabled: disableDashboardSelector, searchBy: 'name' }">
+        </ez-dropdown>
     </div>
     <div class="form-group">
-        <div class="custom-control custom-checkbox">
-            <input name="applyRLS" [(ngModel)]="applyRLS" type="checkbox" class="custom-control-input" id="applyRLS">
+        <div *ngIf="rlsEnabled" class="custom-control custom-checkbox">
+            <input (ngModelChange)="onChangeApplyRLS($event)" name="applyRLS" [(ngModel)]="applyRLS" type="checkbox" class="custom-control-input" id="applyRLS">
             <label class="custom-control-label" for="applyRLS">Apply RLS</label>
         </div>
     </div>
@@ -26,12 +30,19 @@
         <input name="customData" [(ngModel)]="customData" type="text" class="form-control" id="customData" placeholder="Custom Data">
     </div>
     <div *ngIf="applyRLS" class="form-group">
-        <label for="exampleSelect1">Select Role</label>
+        <!-- <label for="exampleSelect1">Select Role</label>
         <select [disabled]="customData === ''" name="roleSelector" class="form-control" [(ngModel)]="selectedRole">
             <option *ngFor="let role of roles" [ngValue]="role">
                 {{role.name}}
             </option>
-        </select>
+        </select> -->
+        <ez-dropdown [ddItems]="roles"
+            [vpn]="'name'"
+            [uidpn]="'name'"
+            [selectedItem]="selectedRole"
+            [ddlText]="'Select Role'"
+            [ddConfig]="{ disabled: customData === '' }">
+        </ez-dropdown>
     </div>
     <button (click)="viewDashboard()" type="button" class="btn btn-primary">View Dashboard</button>
 </form>

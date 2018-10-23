@@ -31,7 +31,7 @@ export class AuthInterceptorService implements HttpInterceptor {
             case 401:
               return this.handle401(request, next);
             case 403:
-              return this.handle403(request, next);
+              return this.handle403(request, next, error.error.error);
             case 500:
               return this.handle500(request, next);
             default:
@@ -49,8 +49,8 @@ export class AuthInterceptorService implements HttpInterceptor {
     return next.handle(request);
   }
 
-  handle403(request: HttpRequest<any>, next: HttpHandler) {
-    this.toasterService.pop('error', 'Token', 'Invalid Access Token');
+  handle403(request: HttpRequest<any>, next: HttpHandler, error: any) {
+    this.toasterService.pop('error', error.code, error.message);
     return next.handle(request);
   }
 

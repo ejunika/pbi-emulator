@@ -17,6 +17,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { LoginComponent } from './login/login.component';
 import { GroupService } from './group.service';
 import { HelpComponent } from './help/help.component';
+import { EzUtilModule } from './ez-util/ez-util.module';
 
 
 @NgModule({
@@ -36,6 +37,7 @@ import { HelpComponent } from './help/help.component';
     AppRoutingModule,
     LocalStorageModule,
     BrowserAnimationsModule,
+    EzUtilModule,
     ToasterModule.forRoot()
   ],
   providers: [

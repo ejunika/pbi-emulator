@@ -2,8 +2,9 @@ import { Component, OnInit, ViewChild, ElementRef, Input, EventEmitter, Output }
 import { service, factories, models, Report } from 'powerbi-client';
 import { parse } from 'papaparse';
 import { DataService } from '../data.service';
-import { IEmbedConfigurationBase, ISettings } from 'embed';
+import { IEmbedConfiguration, ISettings } from 'embed';
 import { LocalStorage } from '@ngx-pwa/local-storage';
+import { ToasterService } from 'angular2-toaster';
 
 @Component({
   selector: 'app-mainpanel',
@@ -24,7 +25,8 @@ export class MainpanelComponent implements OnInit {
 
   constructor(
     private dataService: DataService,
-    private localStorage: LocalStorage
+    private localStorage: LocalStorage,
+    private toasterService: ToasterService
   ) { }
 
   ngOnInit(): void {
@@ -96,7 +98,7 @@ export class MainpanelComponent implements OnInit {
         let expiration = Date.parse(res.expiration);
         let countdownSeconds = (expiration - currentTime) / 1000;
         this.onCountdownStart.emit(countdownSeconds);
-        const config: IEmbedConfigurationBase = {
+        const config: IEmbedConfiguration = {
           type: 'report',
           accessToken: res.token,
           embedUrl: embedUrl,
@@ -105,12 +107,20 @@ export class MainpanelComponent implements OnInit {
         };
         const powerbi = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
         const reportContainer = this.pbiContainer.nativeElement;
-        powerbi.reset(reportContainer);
-        const report = <Report>powerbi.embed(reportContainer, config);
-        report.off('loaded');
-        report.on('loaded', () => {
-          console.log('[info]: Report is embeded to the application');
-        });
+        if (reportContainer) {
+          powerbi.reset(reportContainer);
+          const report = <Report>powerbi.embed(reportContainer, config);
+          if (report) {
+            report.off('loaded');
+            report.on('loaded', () => {
+              this.toasterService.pop('info', 'Reports', 'Report loaded');
+            });
+            report.off('rendered');
+            report.on('rendered', () => {
+              this.toasterService.pop('success', 'Reports', 'Report rendered');
+            });
+          }
+        }
       });
     });
   }

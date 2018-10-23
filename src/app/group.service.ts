@@ -25,7 +25,7 @@ export class GroupService {
     let mappedGroups: Array<any>;
     if (groups) {
       mappedGroups = groups.map(group => {
-        group.tanentName = this.tanentMap.get(group.name);
+        group.tanentName = this.tanentMap.get(group.name) || group.name;
         return group;
       });
       return mappedGroups.sort((a, b) => a.tanentName - b.tanentName);
