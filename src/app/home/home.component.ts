@@ -1,10 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import * as $ from 'jquery';
-import 'bootstrap';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { LeftpanelComponent } from '../leftpanel/leftpanel.component';
-
+declare var $: any;
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',

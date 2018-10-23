@@ -19,6 +19,8 @@ export class HeaderComponent implements OnInit {
 
   reportExpiresIn: string;
 
+  showTimer: boolean = false;
+
   interval: any;
 
   constructor() { }
@@ -45,6 +47,7 @@ export class HeaderComponent implements OnInit {
     if (this.interval) {
       clearInterval(this.interval);
     }
+    this.showTimer = true;
     this.interval = setInterval(() => {
       --countdownSeconds;
       if (countdownSeconds > 0) {
