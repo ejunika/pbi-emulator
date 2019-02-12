@@ -18,6 +18,7 @@ import { LoginComponent } from './login/login.component';
 import { GroupService } from './group.service';
 import { HelpComponent } from './help/help.component';
 import { EzUtilModule } from './ez-util/ez-util.module';
+import { ConfirmDialogService } from './confirm-dialog.service';
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import { EzUtilModule } from './ez-util/ez-util.module';
   ],
   providers: [
     DataService,
+    ConfirmDialogService,
     GroupService,
     localStorageProviders({ prefix: 'myapp' }),
     {

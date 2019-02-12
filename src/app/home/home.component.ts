@@ -29,6 +29,8 @@ export class HomeComponent implements OnInit {
 
   showHelpOnStart: boolean;
 
+  _showFilterPane: boolean;
+
   districtList: Array<any>;
 
   constructor(
@@ -36,10 +38,24 @@ export class HomeComponent implements OnInit {
     private toasterService: ToasterService
   ) { }
 
+  set showFilterPane(flag: boolean) {
+    this.localStorage.setItem('showFilterPane', flag).subscribe((res) => {
+      this._showFilterPane = res;
+    });
+  }
+
+  get showFilterPane(): boolean {
+    return this._showFilterPane;
+  }
+
   ngOnInit() {
     this.localStorage.getItem('dontShowNextTime').subscribe(dontShowNextTime => {
       this.showHelpOnStart = !dontShowNextTime;
     });
+    this.localStorage.getItem('showFilterPane')
+      .subscribe((res) => {
+        this._showFilterPane = res;
+      });
   }
 
   onChangeShowHelpOnStart(): void {

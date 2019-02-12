@@ -1,92 +1,179 @@
-<app-header #header (onClickUpdateUsername)="openManageAccountModal()" (onClickManageDistrict)="openManageDistrictModal()"
-    (onClickRefreshToken)="openRefreshTokenModal()">
+<app-header
+  #header
+  (onClickUpdateUsername)="openManageAccountModal()"
+  (onClickManageDistrict)="openManageDistrictModal()"
+  (onClickRefreshToken)="openRefreshTokenModal()"
+>
 </app-header>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-12">
-            <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
-        </div>
-        <div class="col-lg-10 col-md-10 col-sm-12">
-            <app-mainpanel (onCountdownStart)="header.onCountdownStart($event)" #mainPanel></app-mainpanel>
-        </div>
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <div class="col-lg-2 col-md-2 col-sm-12">
+      <app-leftpanel
+        #leftPanel
+        (embed)="mainPanel.onEmbed($event)"
+      ></app-leftpanel>
     </div>
-    <div #refreshToken class="modal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Manage Token</h5>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="exampleTextarea">Azure Access Token</label>
-                            <textarea name="azureAccessToken" data-gramm_editor="false" spellcheck="false" [(ngModel)]="azureAccessToken"
-                                class="form-control" id="azureAccessToken" rows="10"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button (click)="saveAzureToken()" type="button" class="btn btn-primary">Save</button>
-                </div>
+    <div class="col-lg-10 col-md-10 col-sm-12">
+      <app-mainpanel
+        (onCountdownStart)="header.onCountdownStart($event)"
+        #mainPanel
+      ></app-mainpanel>
+    </div>
+  </div>
+  <div #refreshToken class="modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Manage Token</h5>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="exampleTextarea">Azure Access Token</label>
+              <textarea
+                name="azureAccessToken"
+                data-gramm_editor="false"
+                spellcheck="false"
+                [(ngModel)]="azureAccessToken"
+                class="form-control"
+                id="azureAccessToken"
+                rows="10"
+              ></textarea>
             </div>
+          </form>
         </div>
+        <div class="modal-footer">
+          <button
+            (click)="saveAzureToken()"
+            type="button"
+            class="btn btn-primary"
+          >
+            Save
+          </button>
+        </div>
+      </div>
     </div>
-    <div #manageAccount class="modal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Manage Account</h5>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
-                                placeholder="Username">
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input (change)="onChangeShowHelpOnStart()" name="showHelpOnStart" [(ngModel)]="showHelpOnStart"
-                                    type="checkbox" class="custom-control-input" id="showHelpOnStart">
-                                <label class="custom-control-label" for="showHelpOnStart">Show help on start</label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button (click)="saveUsername()" type="button" class="btn btn-primary">Save</button>
-                </div>
+  </div>
+  <div #manageAccount class="modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Manage Account</h5>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                name="username"
+                [(ngModel)]="username"
+                type="text"
+                class="form-control"
+                id="username"
+                placeholder="Username"
+              />
             </div>
-        </div>
-    </div>
-    <div #manageDistrict class="modal">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Map District UID As</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <form>
-                            <div *ngFor="let district of districtList; let i = index" class="form-group row">
-                                <input [name]="'districtUID-' + i" [(ngModel)]="district.uid" type="text" class="form-control col-md-5"
-                                placeholder="District UID">
-                                <input [name]="'districtName-' + i" [(ngModel)]="district.name" type="text" class="form-control col-md-5"
-                                    placeholder="As">
-                                <button (click)="deleteDistrict()" type="button" class="btn btn-danger col">Delete</button>
-                            </div>
-                            <div class="form-group row">
-                                <button (click)="addMore()" type="button" class="btn btn-success col-md-12">Add
-                                    More District</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button (click)="saveDistricts()" type="button" class="btn btn-primary">Save</button>
-                </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  (change)="onChangeShowHelpOnStart()"
+                  name="showHelpOnStart"
+                  [(ngModel)]="showHelpOnStart"
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="showHelpOnStart"
+                />
+                <label class="custom-control-label" for="showHelpOnStart"
+                  >Show help on start</label
+                >
+              </div>
             </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  name="showFilterPane"
+                  [(ngModel)]="showFilterPane"
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="showFilterPane"
+                />
+                <label class="custom-control-label" for="showFilterPane"
+                  >Show filter pane</label
+                >
+              </div>
+            </div>
+          </form>
         </div>
+        <div class="modal-footer">
+          <button
+            (click)="saveUsername()"
+            type="button"
+            class="btn btn-primary"
+          >
+            Save
+          </button>
+        </div>
+      </div>
     </div>
-    <toaster-container></toaster-container>
+  </div>
+  <div #manageDistrict class="modal">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Map District UID As</h5>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <form>
+              <div
+                *ngFor="let district of districtList; let i = index"
+                class="form-group row"
+              >
+                <input
+                  [name]="'districtUID-' + i"
+                  [(ngModel)]="district.uid"
+                  type="text"
+                  class="form-control col-md-5"
+                  placeholder="District UID"
+                />
+                <input
+                  [name]="'districtName-' + i"
+                  [(ngModel)]="district.name"
+                  type="text"
+                  class="form-control col-md-5"
+                  placeholder="As"
+                />
+                <button
+                  (click)="deleteDistrict()"
+                  type="button"
+                  class="btn btn-danger col"
+                >
+                  Delete
+                </button>
+              </div>
+              <div class="form-group row">
+                <button
+                  (click)="addMore()"
+                  type="button"
+                  class="btn btn-success col-md-12"
+                >
+                  Add More District
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            (click)="saveDistricts()"
+            type="button"
+            class="btn btn-primary"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <toaster-container></toaster-container>
 </div>
