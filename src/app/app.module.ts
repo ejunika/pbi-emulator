@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -19,6 +19,7 @@ import { GroupService } from './group.service';
 import { HelpComponent } from './help/help.component';
 import { EzUtilModule } from './ez-util/ez-util.module';
 import { ConfirmDialogService } from './confirm-dialog.service';
+import { AppUtilService } from './app-util.service';
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { ConfirmDialogService } from './confirm-dialog.service';
   ],
   providers: [
     DataService,
+    AppUtilService,
     ConfirmDialogService,
     GroupService,
     localStorageProviders({ prefix: 'myapp' }),
