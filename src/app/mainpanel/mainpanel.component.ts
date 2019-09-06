@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output } from '@angular/core';
-import { service, factories, models } from 'powerbi-client';
+import { service, factories, models, Page } from 'powerbi-client';
 import { parse } from 'papaparse';
 import { DataService } from '../data.service';
 import { IEmbedConfiguration, ISettings, IEmbedSettings } from 'embed';
@@ -119,7 +119,10 @@ export class MainpanelComponent implements OnInit {
               if (report) {
                 report.off('loaded');
                 report.on('loaded', () => {
-                  //this.toasterService.pop('info', 'Reports', 'Report loaded');
+                  report.getPages()
+                    .then((pages: Array<Page>) => {
+                      console.log('[Info]', pages);
+                    });
                 });
                 report.off('rendered');
                 report.on('rendered', () => {

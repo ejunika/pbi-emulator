@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ViewChild, ElementRef, Inject } from '@angular/core';
 import { DropdownItem } from './dropdown-item';
 import { DropdownConfig } from './dropdown-config';
 import { DropdownEvent } from 'bootstrap';
 import * as _ from 'lodash';
+import { DOCUMENT } from '@angular/common';
 
 declare const $: any;
 const DD_ON_SHOW: DropdownEvent = 'show.bs.dropdown';
@@ -33,6 +34,9 @@ export class DropdownComponent implements OnInit {
   @Input('ddlText')
   ddlText: string;
 
+  @Input('copyTextEnabled')
+  copyTextEnabled: boolean;
+
   @Output('onItemChange')
   onItemChange: EventEmitter<Array<DropdownItem> | DropdownItem> = new EventEmitter<Array<DropdownItem> | DropdownItem>();
 
@@ -47,7 +51,9 @@ export class DropdownComponent implements OnInit {
   @ViewChild('searchTextInput')
   searchTextInput: ElementRef;
 
-  constructor() { }
+  constructor(
+    @Inject(DOCUMENT) private document: Document
+  ) { }
 
   ngOnInit() {
     this.initListeners();
@@ -72,6 +78,11 @@ export class DropdownComponent implements OnInit {
         }
       }, 0);
     });
+  }
+
+  copyText(copierInput: HTMLInputElement): void {
+    copierInput.select();
+    this.document.execCommand('copy');
   }
 
 }

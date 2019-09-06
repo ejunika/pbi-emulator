@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LocalStorageModule, localStorageProviders } from '@ngx-pwa/local-storage';
 import { ToasterModule } from 'angular2-toaster';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -38,6 +39,7 @@ import { AppUtilService } from './app-util.service';
     FormsModule,
     AppRoutingModule,
     LocalStorageModule,
+    AngularFontAwesomeModule,
     BrowserAnimationsModule,
     EzUtilModule,
     ToasterModule.forRoot()

@@ -1,23 +1,52 @@
 .search-text {
     padding: 5px;
 }
+
 .ez-dropdown {
     width: 100%;
+
     .dropdown-toggle {
         text-overflow: ellipsis;
         overflow: hidden;
     }
+
     .dropdown-menu {
         width: 100%;
+
         .ez-dropdown-items {
             max-height: 300px;
             overflow-y: auto;
             overflow-x: hidden;
         }
+
         .dropdown-item {
             text-overflow: ellipsis;
             overflow: hidden;
+
+            .edi-display-text {
+                width: 87%;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                line-height: 30px;
+            }
+
+            ::selection {
+                color: transparent;
+                background: transparent;
+            }
+
+            .copier-input {
+                position: absolute;
+                z-index: -1;
+                padding: 0;
+                margin: 0;
+                border: 0;
+                color: transparent;
+            }
+
+            .copier-input:FOCUS {
+                outline: none;
+            }
         }
     }
 }
-

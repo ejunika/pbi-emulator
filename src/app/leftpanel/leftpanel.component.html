@@ -1,7 +1,7 @@
 <form class="mt-2">
     <div class="form-group">
         <ez-dropdown [ddItems]="groups" [vpn]="'tenantName'" [uidpn]="'id'" [ddlText]="'Select District'"
-            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)"
+            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)" [copyTextEnabled]="false"
             [ddConfig]="{searchable: true, disabled: disableDistrictSelector}">
         </ez-dropdown>
     </div>
@@ -30,6 +30,6 @@
     </div>
     <button [disabled]="!this.selectedGroup?.id || !this.selectedReport?.id" (click)="viewDashboard()" type="button"
         class="btn btn-block" [ngClass]="{ 'btn-primary': (!!this.selectedGroup?.id && !!this.selectedReport?.id) }">
-        See Report
+        Get Set Go <fa name="fighter-jet"></fa>
     </button>
 </form>
