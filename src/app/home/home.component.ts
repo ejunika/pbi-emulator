@@ -120,15 +120,16 @@ export class HomeComponent implements OnInit {
 
   saveDistricts(): void {
     this.districtList = this.districtList.filter(district => district.name && district.uid);
-    this.localStorage.setItem('districtList', this.districtList).subscribe(res => {
-      if (res) {
-        let manageDistrictModel = this.manageDistrictModel.nativeElement;
-        if (manageDistrictModel) {
-          $(manageDistrictModel).modal('hide');
+    this.localStorage.setItem('districtList', this.districtList)
+      .subscribe(res => {
+        if (res) {
+          let manageDistrictModel = this.manageDistrictModel.nativeElement;
+          if (manageDistrictModel) {
+            $(manageDistrictModel).modal('hide');
+          }
+          this.toasterService.pop('success', 'Manage District', 'District list updated');
         }
-        this.toasterService.pop('success', 'Manage District', 'District list updated');
-      }
-    });
+      });
   }
 
   saveAzureToken(): void {

@@ -96,8 +96,8 @@ export class DataService {
     return url;
   }
 
-  get(url: string, urlParams?: string | string[], searchParams?: {}): Observable<any> {
-    return this.http.get<any>(this.buildUrl(url, urlParams, searchParams));
+  get<T>(url: string, urlParams?: string | string[], searchParams?: {}): Observable<T> {
+    return this.http.get<T>(this.buildUrl(url, urlParams, searchParams));
   }
 
 }

@@ -1,7 +1,7 @@
 <form class="mt-2">
     <div class="form-group">
         <ez-dropdown [ddItems]="groups" [vpn]="'tenantName'" [uidpn]="'id'" [ddlText]="'Select District'"
-            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)" [copyTextEnabled]="false"
+            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)" [copyTextEnabled]="true"
             [ddConfig]="{searchable: true, disabled: disableDistrictSelector}">
         </ez-dropdown>
     </div>
@@ -13,8 +13,7 @@
     </div>
     <div class="form-group">
         <div *ngIf="rlsEnabled" class="custom-control custom-checkbox">
-            <input (ngModelChange)="onChangeApplyRLS($event)" name="applyRLS" [(ngModel)]="applyRLS" type="checkbox"
-                class="custom-control-input" id="applyRLS" />
+            <input name="applyRLS" [(ngModel)]="applyRLS" type="checkbox" class="custom-control-input" id="applyRLS" />
             <label class="custom-control-label" for="applyRLS">Apply RLS</label>
         </div>
     </div>
@@ -30,6 +29,9 @@
     </div>
     <button [disabled]="!this.selectedGroup?.id || !this.selectedReport?.id" (click)="viewDashboard()" type="button"
         class="btn btn-block" [ngClass]="{ 'btn-primary': (!!this.selectedGroup?.id && !!this.selectedReport?.id) }">
-        Get Set Go <fa name="fighter-jet"></fa>
+        Get Set Go
+        <fa class="d-inline-block animated" [ngClass]="{ 'bounceOutRight': isTakenOff, 'bounceInLeft': !isTakenOff }"
+            name="fighter-jet">
+        </fa>
     </button>
 </form>

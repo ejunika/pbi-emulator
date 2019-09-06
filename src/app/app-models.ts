@@ -50,3 +50,7 @@ export interface IRole {
     name: string;
     dex: RoleType;
 }
+
+export class AppData {
+
+}

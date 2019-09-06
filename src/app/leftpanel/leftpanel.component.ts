@@ -4,6 +4,7 @@ import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { IEmbedInfo, GroupRI, ReportRI, IReport, IGroup, IRole } from '../app-models';
+import { AppUtilService } from '../app-util.service';
 
 @Component({
   selector: 'app-leftpanel',
@@ -23,17 +24,17 @@ export class LeftpanelComponent implements OnInit {
   disableDashboardSelector: boolean = true;
 
   applyRLS: boolean;
-  viewDisabled: boolean = true;
   customData: string = '';
   selectedRole: IRole;
   username: string;
   rlsEnabled: boolean;
+  isTakenOff: boolean = false;
 
   @Output()
   embed: EventEmitter<IEmbedInfo> = new EventEmitter();
 
   constructor(
-    private dataService: DataService,
+    private appUtilService: AppUtilService,
     private groupService: GroupService,
     private toasterService: ToasterService,
     private localStorage: LocalStorage
@@ -78,25 +79,9 @@ export class LeftpanelComponent implements OnInit {
     this.initReports(group.id);
   }
 
-  onChangeReport(): void {
-    if (this.selectedReport.name) {
-      this.viewDisabled = false;
-    } else {
-      this.viewDisabled = true;
-    }
-  }
-
   selectReport(report: IReport) {
     this.selectedReport = report;
-    if (this.selectedReport.name) {
-      this.viewDisabled = false;
-    } else {
-      this.viewDisabled = true;
-    }
-  }
-
-  onChangeApplyRLS(applyRLS: boolean): void {
-
+    this.isTakenOff = false;
   }
 
   viewDashboard(): void {
@@ -108,12 +93,13 @@ export class LeftpanelComponent implements OnInit {
       role: this.applyRLS ? this.selectedRole.dex : ''
     };
     this.embed.emit(embedInfo);
+    this.isTakenOff = true;
   }
 
   initGroups(): void {
-    this.dataService.get('myorg', ['groups'])
-      .subscribe((groupRI: GroupRI) => {
-        this.groups = this.groupService.transform(groupRI.value);
+    this.appUtilService.getGroups()
+      .subscribe((groups: Array<IGroup>) => {
+        this.groups = this.groupService.transform(groups);
         if (this.groups.length > 0) {
           this.disableDistrictSelector = false;
         }
@@ -123,9 +109,9 @@ export class LeftpanelComponent implements OnInit {
   initReports(groupId: string): void {
     this.selectedReport = <IReport>{};
     this.disableDashboardSelector = true;
-    this.dataService.get('myorg', ['groups', groupId, 'reports'])
-      .subscribe((reportRI: ReportRI) => {
-        this.reports = reportRI.value;
+    this.appUtilService.getReports(groupId)
+      .subscribe((reports: Array<IReport>) => {
+        this.reports = reports;
         if (this.reports.length > 0) {
           this.disableDashboardSelector = false;
         } else {

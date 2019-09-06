@@ -21,6 +21,7 @@ import { HelpComponent } from './help/help.component';
 import { EzUtilModule } from './ez-util/ez-util.module';
 import { ConfirmDialogService } from './confirm-dialog.service';
 import { AppUtilService } from './app-util.service';
+import { AppResolverService } from './app-resolver.service';
 
 
 @NgModule({
@@ -47,6 +48,7 @@ import { AppUtilService } from './app-util.service';
   providers: [
     DataService,
     AppUtilService,
+    AppResolverService,
     ConfirmDialogService,
     GroupService,
     localStorageProviders({ prefix: 'myapp' }),
