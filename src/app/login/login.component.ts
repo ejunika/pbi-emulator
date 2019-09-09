@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DataService } from '../data.service';
 import { LocalStorage } from '@ngx-pwa/local-storage';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -9,13 +11,13 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 })
 export class LoginComponent implements OnInit {
 
-  clientId: string;
-  username: string;
-  password: string;
+  azureAccessToken: string;
 
   constructor(
     private dataService: DataService,
-    private localStorage: LocalStorage
+    private localStorage: LocalStorage,
+    private jwtHelperService: JwtHelperService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -23,10 +25,11 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-    if (this.clientId && this.username && this.password) {
-      this.dataService.login(this.clientId, this.username, this.password).subscribe(res => {
-        this.localStorage.setItem('azureToken', res.token);
-      });
+    if (!this.jwtHelperService.isTokenExpired(this.azureAccessToken)) {
+      this.localStorage.setItem('azureAccessToken', this.azureAccessToken)
+        .subscribe((isDone: boolean) => {
+          this.router.navigate(['home']);
+        });
     }
   }
 

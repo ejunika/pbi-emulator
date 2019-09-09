@@ -87,14 +87,14 @@ export class MainpanelComponent implements OnInit {
               powerbiService.reset(reportContainer);
               let report = <Report>powerbiService.embed(reportContainer, config);
               if (report) {
-                // report.off('rendered');
-                // report.on('rendered', () => {
-                //   report.getPages()
-                //     .then((pages: Array<Page>) => {
-                //       console.log('[Info]', pages);
-                //     });
-                //   setTimeout(() => this.toasterService.pop('success', 'Reports', 'Report rendered'));
-                // });
+                report.off('rendered');
+                report.on('rendered', () => {
+                  report.getPages()
+                    .then((pages: Array<Page>) => {
+                      console.log('[Info]', pages);
+                    });
+                  setTimeout(() => this.toasterService.pop('success', 'Reports', 'Report rendered'));
+                });
               }
             }
           });

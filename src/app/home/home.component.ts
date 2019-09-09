@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { LeftpanelComponent } from '../leftpanel/leftpanel.component';
+import { AccordionPanel, Accordion } from '../ez-util/components/accordion/accordion-data-models';
 declare var $: any;
 @Component({
   selector: 'app-home',
@@ -22,6 +23,8 @@ export class HomeComponent implements OnInit {
 
   @ViewChild('leftPanel')
   leftPanel: LeftpanelComponent;
+
+  accordion: Accordion;
 
   azureAccessToken: string = '';
 
@@ -49,6 +52,12 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.accordion = new Accordion()
+    //   .addPanel(new AccordionPanel('A', LeftpanelComponent))
+    //   .addPanel(new AccordionPanel('B', LeftpanelComponent));
+    // this.accordion.panels[0].body.instance.embed.subscribe((e) => {
+    //   debugger;
+    // });
     this.localStorage.getItem('dontShowNextTime').subscribe(dontShowNextTime => {
       this.showHelpOnStart = !dontShowNextTime;
     });
@@ -61,16 +70,6 @@ export class HomeComponent implements OnInit {
   onChangeShowHelpOnStart(): void {
     this.localStorage.setItem('dontShowNextTime', !this.showHelpOnStart).subscribe(res => {
 
-    });
-  }
-
-  openRefreshTokenModal(): void {
-    let refreshTokenModal = this.refreshTokenModal.nativeElement;
-    this.localStorage.getItem('azureAccessToken').subscribe(azureAccessToken => {
-      this.azureAccessToken = azureAccessToken;
-      if (refreshTokenModal) {
-        $(refreshTokenModal).modal('show');
-      }
     });
   }
 
@@ -138,6 +137,7 @@ export class HomeComponent implements OnInit {
       if (res) {
         let refreshTokenModal = this.refreshTokenModal.nativeElement;
         this.leftPanel.initGroups();
+        // this.accordion.panels[0].body.initGroups();
         if (refreshTokenModal) {
           $(refreshTokenModal).modal('hide');
           this.toasterService.pop('success', 'Token', 'Token refresed');

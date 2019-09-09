@@ -6,6 +6,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LocalStorageModule, localStorageProviders } from '@ngx-pwa/local-storage';
 import { ToasterModule } from 'angular2-toaster';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { JwtModule, JwtHelperService } from "@auth0/angular-jwt";
+import { NgxSpinnerModule } from "ngx-spinner";
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -22,6 +24,9 @@ import { EzUtilModule } from './ez-util/ez-util.module';
 import { ConfirmDialogService } from './confirm-dialog.service';
 import { AppUtilService } from './app-util.service';
 import { AppResolverService } from './app-resolver.service';
+import { AuthService } from './auth/auth.service';
+import { AuthGuardService } from './auth/auth-guard.service';
+import { LoginGuardService } from './auth/login-guard.service';
 
 
 @NgModule({
@@ -34,6 +39,9 @@ import { AppResolverService } from './app-resolver.service';
     LoginComponent,
     HelpComponent
   ],
+  entryComponents: [
+    LeftpanelComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -43,13 +51,25 @@ import { AppResolverService } from './app-resolver.service';
     AngularFontAwesomeModule,
     BrowserAnimationsModule,
     EzUtilModule,
-    ToasterModule.forRoot()
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: () => {
+          return '';
+        }
+      }
+    }),
+    ToasterModule.forRoot(),
+    NgxSpinnerModule
   ],
   providers: [
     DataService,
     AppUtilService,
     AppResolverService,
     ConfirmDialogService,
+    AuthService,
+    JwtHelperService,
+    AuthGuardService,
+    LoginGuardService,
     GroupService,
     localStorageProviders({ prefix: 'myapp' }),
     {

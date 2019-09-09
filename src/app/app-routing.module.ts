@@ -5,6 +5,8 @@ import { LoginComponent } from './login/login.component';
 import { HelpComponent } from './help/help.component';
 import { ConfirmDialogService } from './confirm-dialog.service';
 import { AppResolverService } from './app-resolver.service';
+import { AuthGuardService } from './auth/auth-guard.service';
+import { LoginGuardService } from './auth/login-guard.service';
 
 const routes: Routes = [
   {
@@ -14,14 +16,16 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [LoginGuardService]
   },
   {
     path: 'home',
     component: HomeComponent,
     resolve: {
       appResolverService: AppResolverService
-    }
+    },
+    canActivate: [AuthGuardService]
   },
   {
     path: 'help',
