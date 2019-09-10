@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { models, Page } from 'powerbi-client';
 import { IEmbedConfiguration, IEmbedSettings } from 'embed';
 import { LocalStorage } from '@ngx-pwa/local-storage';
@@ -15,9 +15,6 @@ import { Report } from 'report';
 export class MainpanelComponent implements OnInit {
   @ViewChild('pbiContainer')
   pbiContainer: ElementRef;
-
-  @Output('onCountdownStart')
-  onCountdownStart: EventEmitter<number> = new EventEmitter<number>();
 
   selectedStudents: Array<any>;
 
@@ -73,7 +70,6 @@ export class MainpanelComponent implements OnInit {
         }
         this.appUtilService.getReportEmbedToken(reqData, groupId, reportId)
           .subscribe((tokenRI: TokenRI) => {
-            this.onCountdownStart.emit(this.appUtilService.getCountDownSeconds(tokenRI.expiration));
             let config: IEmbedConfiguration = {
               type: 'report',
               accessToken: tokenRI.token,
@@ -87,14 +83,10 @@ export class MainpanelComponent implements OnInit {
               powerbiService.reset(reportContainer);
               let report = <Report>powerbiService.embed(reportContainer, config);
               if (report) {
-                report.off('rendered');
-                report.on('rendered', () => {
-                  report.getPages()
-                    .then((pages: Array<Page>) => {
-                      console.log('[Info]', pages);
-                    });
-                  setTimeout(() => this.toasterService.pop('success', 'Reports', 'Report rendered'));
-                });
+                let reportEvents = [
+                  { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }
+                ];
+                this.appUtilService.addEventsToReport(report, reportEvents);
               }
             }
           });
@@ -109,10 +101,19 @@ export class MainpanelComponent implements OnInit {
     return Math.random() * (max - min) + min;
   }
 
-  getClass(): String {
-    let classes = 'primary, secondary, success, danger, warning, info, light, dark'.split(
-      ', '
-    );
+  getClass(): string {
+    let classes = 'primary, secondary, success, danger, warning, info, light, dark'.split(', ');
     return 'badge-' + classes[this.getRandomInt(0, 7)];
   }
+
+  private onReportLoaded(report: Report, customEvent: CustomEvent): void {
+    setTimeout(() => {
+      report.getPages()
+        .then((pages: Array<Page>) => {
+          console.log('[Info]', pages);
+        });
+      this.toasterService.pop('success', 'Reports', 'Report Loaded')
+    });
+  }
+
 }

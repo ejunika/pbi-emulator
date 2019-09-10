@@ -34,6 +34,8 @@ export class AuthInterceptorService implements HttpInterceptor {
         .catch((error: any) => {
           if (error instanceof HttpErrorResponse) {
             switch ((error).status) {
+              case 400:
+                return this.handle400(request, next);
               case 401:
                 return this.handle401(request, next);
               case 403:
@@ -55,6 +57,12 @@ export class AuthInterceptorService implements HttpInterceptor {
           }
         })
     });
+  }
+
+  handle400(request: HttpRequest<any>, next: HttpHandler) {
+    this.toasterService.pop('error', 'Identity', 'Report does not support Effective Identity');
+    this.spinnerService.hide();
+    return next.handle(request);
   }
 
   handle401(request: HttpRequest<any>, next: HttpHandler) {

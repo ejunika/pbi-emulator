@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { AppUtilService } from '../app-util.service';
 
 @Component({
   selector: 'app-header',
@@ -23,10 +24,13 @@ export class HeaderComponent implements OnInit {
 
   interval: any;
 
-  constructor() { }
+  constructor(
+    private appUtilService: AppUtilService
+  ) { }
 
   ngOnInit() {
     this.reportExpiresIn = '00:00:00';
+    this.onCountdownStart(this.appUtilService.appData.countDownSeconds)
   }
 
   openMangeAccountModal(): void {
@@ -41,17 +45,17 @@ export class HeaderComponent implements OnInit {
     this.onClickManageDistrict.emit();
   }
 
-  onCountdownStart(countdownSeconds): void {
-    countdownSeconds = parseInt(countdownSeconds);
+  onCountdownStart(countdownSeconds: number): void {
+    let wholeCountdownSeconds = parseInt(countdownSeconds.toString());
     this.reportExpiresIn = this.hhmmss(0);
     if (this.interval) {
       clearInterval(this.interval);
     }
     this.showTimer = true;
     this.interval = setInterval(() => {
-      --countdownSeconds;
-      if (countdownSeconds > 0) {
-        this.reportExpiresIn = this.hhmmss(countdownSeconds);
+      --wholeCountdownSeconds;
+      if (wholeCountdownSeconds > 0) {
+        this.reportExpiresIn = this.hhmmss(wholeCountdownSeconds);
       } else {
         this.reportExpiresIn = this.hhmmss(0);
         clearInterval(this.interval);

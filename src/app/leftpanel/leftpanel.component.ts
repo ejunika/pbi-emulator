@@ -1,9 +1,8 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { DataService } from '../data.service';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, GroupRI, ReportRI, IReport, IGroup, IRole } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 
 @Component({

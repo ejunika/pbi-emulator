@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { service, factories } from 'powerbi-client';
+import { service, factories, Report } from 'powerbi-client';
 import { Observable } from 'rxjs/Observable';
-import { TokenRI, IGroup, GroupRI, IReport, ReportRI } from './app-models';
+import { TokenRI, IGroup, GroupRI, IReport, ReportRI, AppData } from './app-models';
 import { DataService } from './data.service';
 import { map } from 'rxjs/operators/map';
 
@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators/map';
 export class AppUtilService {
 
   powerbiService: service.Service;
+  appData: AppData;
 
   constructor(
     private dataService: DataService
@@ -39,11 +40,13 @@ export class AppUtilService {
       }));
   }
 
-  getCountDownSeconds(utfTimeStamp: string) {
-    let currentISO = new Date().toISOString();
-    let currentTime = Date.parse(currentISO);
-    let expiration = Date.parse(utfTimeStamp);
-    return (expiration - currentTime) / 1000;
+  addEventsToReport(report: Report, events: Array<{ name: string, handler: (...args: any) => void }>): void {
+    if (report && events) {
+      events.forEach((event: { name: string, handler: () => void }) => {
+        report.off(event.name, event.handler);
+        report.on(event.name, event.handler);
+      });
+    }
   }
 
 }

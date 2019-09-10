@@ -34,9 +34,8 @@ const routes: Routes = [
       appResolverService: AppResolverService
     },
     canActivate: [
-      ConfirmDialogService
-    ],
-    canDeactivate: [ConfirmDialogService]
+      AuthGuardService
+    ]
   }
 ];
 

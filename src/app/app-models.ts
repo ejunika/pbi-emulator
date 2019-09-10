@@ -52,5 +52,5 @@ export interface IRole {
 }
 
 export class AppData {
-
+    countDownSeconds: number;
 }

@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" routerLink="/home">
         <!-- <img src="assets/images/qna.png" style="width: 100px" /> -->
         Power BI Emulator
     </a>
@@ -14,14 +14,15 @@
                 <a (click)="openMangeAccountModal()" class="nav-link" href="javascript: void(0)">Manage Account</a>
             </li>
             <li class="nav-item">
-                <a (click)="openMangeDistrictModal()" class="nav-link" href="javascript: void(0)">Manage District</a>
-            </li>
-            <li class="nav-item">
-                <a routerLink="/help" class="nav-link">Help</a>
+                <a (click)="openMangeDistrictModal()" class="nav-link" href="javascript: void(0)">Map District</a>
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
-            <span *ngIf="showTimer">Report will expires in <strong>{{reportExpiresIn}}</strong> Hours</span>
+            <span *ngIf="showTimer">
+                Access Token will expire in
+                <strong>{{reportExpiresIn}}</strong>
+                Hours
+            </span>
         </form>
     </div>
 </nav>
