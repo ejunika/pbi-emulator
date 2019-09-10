@@ -36,7 +36,7 @@ export class DataService {
     let formUrlData = '';
     if (data) {
       for (let key in data) {
-        formUrlData += encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";
+        formUrlData += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
       }
     }
     return formUrlData
@@ -87,7 +87,7 @@ export class DataService {
         }
       }
       if (url.lastIndexOf('&') === url.length - 1) {
-        url = url.substr(0, url.length -  1);
+        url = url.substr(0, url.length - 1);
       }
     }
     if (!url.startsWith('http')) {

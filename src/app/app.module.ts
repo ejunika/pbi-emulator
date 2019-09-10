@@ -28,7 +28,6 @@ import { AuthService } from './auth/auth.service';
 import { AuthGuardService } from './auth/auth-guard.service';
 import { LoginGuardService } from './auth/login-guard.service';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -52,11 +51,7 @@ import { LoginGuardService } from './auth/login-guard.service';
     BrowserAnimationsModule,
     EzUtilModule,
     JwtModule.forRoot({
-      config: {
-        tokenGetter: () => {
-          return '';
-        }
-      }
+      config: {}
     }),
     ToasterModule.forRoot(),
     NgxSpinnerModule

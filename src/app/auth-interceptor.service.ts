@@ -7,6 +7,7 @@ import 'rxjs/add/operator/do';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { NgxSpinnerService } from "ngx-spinner";
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
@@ -16,7 +17,8 @@ export class AuthInterceptorService implements HttpInterceptor {
   constructor(
     private localStorage: LocalStorage,
     private toasterService: ToasterService,
-    private spinnerService: NgxSpinnerService
+    private spinnerService: NgxSpinnerService,
+    private router: Router
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -35,7 +37,7 @@ export class AuthInterceptorService implements HttpInterceptor {
               case 401:
                 return this.handle401(request, next);
               case 403:
-                return this.handle403(request, next, error.error.error);
+                return this.handle403(request, next, error.error);
               case 500:
                 return this.handle500(request, next);
               default:
@@ -61,7 +63,12 @@ export class AuthInterceptorService implements HttpInterceptor {
   }
 
   handle403(request: HttpRequest<any>, next: HttpHandler, error: any) {
-    this.toasterService.pop('error', error.code, error.message);
+    let e: any = error ? error.error || { code: 'UnknownError', message: 'UnknownError' } : { code: 'UnknownError', message: 'UnknownError' };
+    this.toasterService.pop('error', e.code, e.message);
+    if (e && e.code === 'TokenExpired' || e.code === 'UnknownError') {
+      this.spinnerService.hide();
+      this.router.navigate(['login']);
+    }
     return next.handle(request);
   }
 
