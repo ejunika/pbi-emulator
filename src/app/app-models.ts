@@ -54,3 +54,12 @@ export interface IRole {
 export class AppData {
     countDownSeconds: number;
 }
+
+export interface AppConfigChangeItem {
+    groupMappingChange: boolean;
+}
+
+export interface ReportEvent {
+    name: string,
+    handler: (...args: Array<any>) => void
+}

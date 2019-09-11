@@ -2,7 +2,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, IReport, IGroup, IRole } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 
 @Component({
@@ -44,6 +44,12 @@ export class LeftpanelComponent implements OnInit {
     this.loadSettings();
     this.initRoles();
     this.initGroups();
+    this.appUtilService.appConfigChangeNotifier
+      .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
+        if (appConfigChangeItem && appConfigChangeItem.groupMappingChange) {
+          this.updateDistrict();
+        }
+      });
   }
 
   loadSettings(): void {
@@ -103,6 +109,12 @@ export class LeftpanelComponent implements OnInit {
           this.disableDistrictSelector = false;
         }
       });
+  }
+
+  updateDistrict(): void {
+    this.groupService.initTenantMap().subscribe(() => {
+      this.groups = this.groupService.transform(this.groups);
+    });
   }
 
   initReports(groupId: string): void {

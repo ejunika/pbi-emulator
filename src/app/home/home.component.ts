@@ -3,6 +3,7 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { LeftpanelComponent } from '../leftpanel/leftpanel.component';
 import { AccordionPanel, Accordion } from '../ez-util/components/accordion/accordion-data-models';
+import { AppUtilService } from '../app-util.service';
 declare var $: any;
 @Component({
   selector: 'app-home',
@@ -38,7 +39,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private localStorage: LocalStorage,
-    private toasterService: ToasterService
+    private toasterService: ToasterService,
+    private appUtilService: AppUtilService
   ) { }
 
   set showFilterPane(flag: boolean) {
@@ -126,6 +128,7 @@ export class HomeComponent implements OnInit {
           if (manageDistrictModel) {
             $(manageDistrictModel).modal('hide');
           }
+          this.appUtilService.appConfigChangeNotifier.next({ groupMappingChange: true });
           this.toasterService.pop('success', 'Manage District', 'District list updated');
         }
       });
