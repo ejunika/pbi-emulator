@@ -70,42 +70,53 @@ export class HomeComponent implements OnInit {
   }
 
   onChangeShowHelpOnStart(): void {
-    this.localStorage.setItem('dontShowNextTime', !this.showHelpOnStart).subscribe(res => {
-
-    });
+    this.localStorage.setItem('dontShowNextTime', !this.showHelpOnStart)
+      .subscribe((isDone: boolean) => {
+        if (isDone) {
+          this.toasterService.pop('info', 'Account', 'Preference updated..');
+        } else {
+          this.toasterService.pop('danger', 'Account', 'Error');
+        }
+      });
   }
 
   openManageAccountModal(): void {
     let manageAccountModel = this.manageAccountModel.nativeElement;
-    this.localStorage.getItem('username').subscribe(username => {
-      this.username = username;
-      if (manageAccountModel) {
-        $(manageAccountModel).modal('show');
-      }
-    });
+    this.localStorage.getItem('username')
+      .subscribe((username: string) => {
+        this.username = username;
+        if (manageAccountModel) {
+          $(manageAccountModel).modal('show');
+        }
+      });
   }
 
   openManageDistrictModal(): void {
     let manageDistrictModel = this.manageDistrictModel.nativeElement;
-    this.localStorage.getItem('districtList').subscribe(districtMap => {
-      this.districtList = districtMap || [];
-      if (manageDistrictModel) {
-        $(manageDistrictModel).modal('show');
-      }
-    });
+    this.localStorage.getItem('districtList')
+      .subscribe(districtMap => {
+        this.districtList = districtMap || [];
+        if (manageDistrictModel) {
+          $(manageDistrictModel).modal('show');
+        }
+      });
   }
 
   saveUsername(): void {
-    this.username = this.username.trim();
-    this.localStorage.setItem('username', this.username).subscribe(res => {
-      if (res) {
-        let manageAccountModel = this.manageAccountModel.nativeElement;
-        if (manageAccountModel) {
-          $(manageAccountModel).modal('hide');
-          this.toasterService.pop('success', 'Account', 'Account updated successfully');
-        }
-      }
-    });
+    let manageAccountModel = this.manageAccountModel.nativeElement;
+    if (manageAccountModel) {
+      this.username = this.username ? this.username.trim() : '';
+      this.localStorage.setItem('username', this.username)
+        .subscribe((isDone: boolean) => {
+          if (isDone) {
+            this.appUtilService.appConfigChangeNotifier.next({ usernameChange: true });
+            $(manageAccountModel).modal('hide');
+            this.toasterService.pop('success', 'Account', 'Account updated successfully');
+          }
+        });
+    } else {
+      $(manageAccountModel).modal('hide');
+    }
   }
 
   addMore(): void {
@@ -120,11 +131,11 @@ export class HomeComponent implements OnInit {
   }
 
   saveDistricts(): void {
+    let manageDistrictModel = this.manageDistrictModel.nativeElement;
     this.districtList = this.districtList.filter(district => district.name && district.uid);
     this.localStorage.setItem('districtList', this.districtList)
-      .subscribe(res => {
-        if (res) {
-          let manageDistrictModel = this.manageDistrictModel.nativeElement;
+      .subscribe((isDone: boolean) => {
+        if (isDone) {
           if (manageDistrictModel) {
             $(manageDistrictModel).modal('hide');
           }

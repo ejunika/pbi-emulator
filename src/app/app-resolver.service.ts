@@ -17,7 +17,7 @@ export class AppResolverService implements Resolve<AppData> {
   ) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppData> | Promise<AppData> | AppData {
-    let appData = new AppData();
+    const appData = new AppData();
     return this.getTokenRemainingSeconds()
       .pipe(map((countDownSeconds: number) => {
         appData.countDownSeconds = countDownSeconds;
@@ -29,15 +29,15 @@ export class AppResolverService implements Resolve<AppData> {
   getTokenRemainingSeconds(): Observable<number> {
     return this.localStorage.getItem('azureAccessToken')
       .pipe(map((azureAccessToken: string) => {
-        let expiryDate: Date = this.jwtHelperService.getTokenExpirationDate(azureAccessToken);
-        return this.getCountDownSeconds(expiryDate.toISOString())
+        const expiryDate: Date = this.jwtHelperService.getTokenExpirationDate(azureAccessToken);
+        return this.getCountDownSeconds(expiryDate.toISOString());
       }));
   }
 
   getCountDownSeconds(utfTimeStamp: string) {
-    let currentISO = new Date().toISOString();
-    let currentTime = Date.parse(currentISO);
-    let expiration = Date.parse(utfTimeStamp);
+    const currentISO = new Date().toISOString();
+    const currentTime = Date.parse(currentISO);
+    const expiration = Date.parse(utfTimeStamp);
     return (expiration - currentTime) / 1000;
   }
 

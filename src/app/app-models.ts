@@ -20,7 +20,7 @@ export interface IGroup {
     isReadOnly: boolean;
     name: string;
     tenantName?: string;
-};
+}
 
 export interface ReportRI {
     '@odata.context': string;
@@ -36,7 +36,7 @@ export interface IReport {
     name: string;
     reportType: string;
     webUrl: string;
-};
+}
 
 export interface IEmbedInfo {
     group: IGroup;
@@ -56,10 +56,12 @@ export class AppData {
 }
 
 export interface AppConfigChangeItem {
-    groupMappingChange: boolean;
+    groupMappingChange?: boolean;
+    usernameChange?: boolean;
+    showFilterPaneChange?: boolean;
 }
 
 export interface ReportEvent {
-    name: string,
-    handler: (...args: Array<any>) => void
+    name: string;
+    handler: (...args: Array<any>) => void;
 }

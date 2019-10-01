@@ -43,7 +43,7 @@ export class DataService {
   }
 
   buildBaseUrl(): string {
-    let baseUrl;
+    let baseUrl: string;
     if (this.serverConfig) {
       if (this.serverConfig.sslEnabled) {
         baseUrl = 'https://';

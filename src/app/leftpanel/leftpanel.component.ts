@@ -46,8 +46,12 @@ export class LeftpanelComponent implements OnInit {
     this.initGroups();
     this.appUtilService.appConfigChangeNotifier
       .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
-        if (appConfigChangeItem && appConfigChangeItem.groupMappingChange) {
-          this.updateDistrict();
+        if (appConfigChangeItem) {
+          if (appConfigChangeItem.groupMappingChange) {
+            this.updateDistrict();
+          } else if (appConfigChangeItem.usernameChange) {
+            this.loadSettings();
+          }
         }
       });
   }
