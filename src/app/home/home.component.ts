@@ -54,15 +54,14 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.accordion = new Accordion()
-    //   .addPanel(new AccordionPanel('A', LeftpanelComponent))
-    //   .addPanel(new AccordionPanel('B', LeftpanelComponent));
-    // this.accordion.panels[0].body.instance.embed.subscribe((e) => {
-    //   debugger;
-    // });
-    this.localStorage.getItem('dontShowNextTime').subscribe(dontShowNextTime => {
-      this.showHelpOnStart = !dontShowNextTime;
-    });
+    this.initAppConfig();
+  }
+
+  initAppConfig(): void {
+    this.localStorage.getItem('dontShowNextTime')
+      .subscribe(dontShowNextTime => {
+        this.showHelpOnStart = !dontShowNextTime;
+      });
     this.localStorage.getItem('showFilterPane')
       .subscribe((res) => {
         this._showFilterPane = res;

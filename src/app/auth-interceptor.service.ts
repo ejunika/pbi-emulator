@@ -32,6 +32,8 @@ export class AuthInterceptorService implements HttpInterceptor {
       });
       return next.handle(clonedRequest)
         .catch((error: any) => {
+          this.requestCount = 0;
+          this.spinnerService.hide();
           if (error instanceof HttpErrorResponse) {
             switch ((error).status) {
               case 400:
