@@ -24,12 +24,15 @@ export class HeaderComponent implements OnInit {
 
   interval: any;
 
+  willTokenExpireShortly: boolean;
+
   constructor(
     private appUtilService: AppUtilService
   ) { }
 
   ngOnInit() {
     this.reportExpiresIn = '00:00:00';
+    this.willTokenExpireShortly = false;
     this.onCountdownStart(this.appUtilService.appData.countDownSeconds)
   }
 
@@ -54,6 +57,9 @@ export class HeaderComponent implements OnInit {
     this.showTimer = true;
     this.interval = setInterval(() => {
       --wholeCountdownSeconds;
+      if (wholeCountdownSeconds <= 60) {
+        this.willTokenExpireShortly = true;
+      }
       if (wholeCountdownSeconds > 0) {
         this.reportExpiresIn = this.hhmmss(wholeCountdownSeconds);
       } else {

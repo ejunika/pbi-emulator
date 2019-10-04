@@ -5,6 +5,7 @@ import { LeftpanelComponent } from '../leftpanel/leftpanel.component';
 import { AppUtilService } from '../app-util.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 declare var $: any;
 @Component({
   selector: 'app-home',
@@ -45,7 +46,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private localStorage: LocalStorage,
     private toasterService: ToasterService,
-    private appUtilService: AppUtilService
+    private appUtilService: AppUtilService,
+    private router: Router
   ) {
     this.usernameUpdate.pipe(debounceTime(500), distinctUntilChanged())
       .subscribe((username: string) => {
@@ -175,6 +177,15 @@ export class HomeComponent implements OnInit {
         }
       }
     });
+  }
+
+  signout(): void {
+    this.localStorage.removeItem('azureAccessToken')
+      .subscribe((isDone: boolean) => {
+        if (isDone) {
+          this.router.navigate(['login']);
+        }
+      });
   }
 
 }

@@ -18,7 +18,7 @@
             </li> -->
         </ul>
         <form class="form-inline my-2 my-lg-0">
-            <span *ngIf="showTimer">
+            <span class="animated infinite" [ngClass]="{ 'heartBeat text-danger': willTokenExpireShortly }" *ngIf="showTimer">
                 Access Token will expire in
                 <strong>{{reportExpiresIn}}</strong>
                 Hours

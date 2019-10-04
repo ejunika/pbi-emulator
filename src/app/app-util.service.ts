@@ -22,6 +22,10 @@ export class AppUtilService {
     private localStorage: LocalStorage
   ) { }
 
+  alert(type: string, title: string, message: string): void {
+    this.toasterService.pop(type, title, message);
+  }
+
   saveItem(key: string, value: any): Observable<boolean> {
     if (typeof value === 'string') {
       value = value.trim();
