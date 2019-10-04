@@ -2,8 +2,9 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { LeftpanelComponent } from '../leftpanel/leftpanel.component';
-import { AccordionPanel, Accordion } from '../ez-util/components/accordion/accordion-data-models';
 import { AppUtilService } from '../app-util.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 declare var $: any;
 @Component({
   selector: 'app-home',
@@ -25,8 +26,6 @@ export class HomeComponent implements OnInit {
   @ViewChild('leftPanel')
   leftPanel: LeftpanelComponent;
 
-  accordion: Accordion;
-
   azureAccessToken: string = '';
 
   username: string = '';
@@ -37,16 +36,32 @@ export class HomeComponent implements OnInit {
 
   districtList: Array<any>;
 
+  isOpenedSidenavLeft: boolean;
+
+  isOpenedSidenavRight: boolean;
+
+  usernameUpdate: Subject<string> = new Subject();
+
   constructor(
     private localStorage: LocalStorage,
     private toasterService: ToasterService,
     private appUtilService: AppUtilService
-  ) { }
+  ) {
+    this.usernameUpdate.pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((username: string) => {
+        this.appUtilService.saveItem('username', username).subscribe();
+      });
+  }
 
   set showFilterPane(flag: boolean) {
-    this.localStorage.setItem('showFilterPane', flag).subscribe((res) => {
-      this._showFilterPane = res;
-    });
+    this.appUtilService.saveItem('showFilterPane', flag)
+      .pipe(tap((isDone: boolean) => {
+        if (isDone) {
+          this.appUtilService.appConfigChangeNotifier.next({ showFilterPaneChange: true });
+          this._showFilterPane = flag;
+        }
+      }))
+      .subscribe();
   }
 
   get showFilterPane(): boolean {
@@ -58,6 +73,8 @@ export class HomeComponent implements OnInit {
   }
 
   initAppConfig(): void {
+    this.isOpenedSidenavLeft = true;
+    this.isOpenedSidenavRight = false;
     this.localStorage.getItem('dontShowNextTime')
       .subscribe(dontShowNextTime => {
         this.showHelpOnStart = !dontShowNextTime;
@@ -65,6 +82,10 @@ export class HomeComponent implements OnInit {
     this.localStorage.getItem('showFilterPane')
       .subscribe((res) => {
         this._showFilterPane = res;
+      });
+    this.localStorage.getItem('username')
+      .subscribe((username: string) => {
+        this.username = username;
       });
   }
 
@@ -104,13 +125,10 @@ export class HomeComponent implements OnInit {
   saveUsername(): void {
     let manageAccountModel = this.manageAccountModel.nativeElement;
     if (manageAccountModel) {
-      this.username = this.username ? this.username.trim() : '';
-      this.localStorage.setItem('username', this.username)
+      this.appUtilService.saveItem('username', this.username)
         .subscribe((isDone: boolean) => {
           if (isDone) {
-            this.appUtilService.appConfigChangeNotifier.next({ usernameChange: true });
             $(manageAccountModel).modal('hide');
-            this.toasterService.pop('success', 'Account', 'Account updated successfully');
           }
         });
     } else {

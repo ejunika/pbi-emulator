@@ -1,10 +1,10 @@
 <app-header #header (onClickUpdateUsername)="openManageAccountModal()"
   (onClickManageDistrict)="openManageDistrictModal()">
 </app-header>
-<div class="container-fluid app-container">
-  <div class="row h-100">
-    <div class="col-lg-3 col-md-3 col-sm-12">
-      <div class="card mt-3 app-layout">
+<mat-sidenav-container class="app-container">
+  <mat-sidenav #sidenavLeft mode="side" [(opened)]="isOpenedSidenavLeft">
+    <div class="app-sidenav mr-1px h-100">
+      <div class="card h-100">
         <div class="card-body">
           <h4 class="card-title">
             Control Pannel
@@ -15,27 +15,36 @@
           <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
         </div>
       </div>
-      <!-- <app-accordion [accordion]="accordion"></app-accordion> -->
     </div>
-    <div class="col">
-      <div class="card mt-3 app-layout">
-        <div class="card-body p-1">
-          <app-mainpanel #mainPanel></app-mainpanel>
-        </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="card h-100">
+      <button (click)="isOpenedSidenavLeft = !isOpenedSidenavLeft"
+        class="btn btn-sm control-panel-toggle-btn dl position-absolute">
+        <fa *ngIf="isOpenedSidenavLeft" name="expand"></fa>
+        <fa *ngIf="!isOpenedSidenavLeft" name="chevron-right"></fa>
+      </button>
+      <div class="card-body p-1">
+        <app-mainpanel #mainPanel></app-mainpanel>
       </div>
+      <button (click)="isOpenedSidenavRight = !isOpenedSidenavRight"
+        class="btn btn-sm control-panel-toggle-btn dr position-absolute">
+        <fa *ngIf="!isOpenedSidenavRight" name="cog"></fa>
+        <fa *ngIf="isOpenedSidenavRight" name="chevron-right"></fa>
+      </button>
     </div>
-  </div>
-  <div #manageAccount class="modal fade">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Manage Account</h5>
-        </div>
-        <div class="modal-body">
+  </mat-sidenav-content>
+  <mat-sidenav [(opened)]="isOpenedSidenavRight" position="end" class="editor-sidenav" #sidenavRight mode="side">
+    <div class="app-sidenav ml-1px h-100">
+      <div class="card h-100">
+        <div class="card-body">
+          <h4 class="card-title">
+            Application Settings
+          </h4>
           <form>
             <div class="form-group">
               <label for="username">Username</label>
-              <input name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
+              <input (ngModelChange)="this.usernameUpdate.next($event)" name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
                 placeholder="Username" />
             </div>
             <div class="form-group">
@@ -52,47 +61,80 @@
                 <label class="custom-control-label" for="showFilterPane">Show filter pane</label>
               </div>
             </div>
+            <button (click)="openManageDistrictModal()" class="btn btn-primary btn-sm">Map District</button>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button (click)="saveUsername()" type="button" class="btn btn-primary">
-            Save
-          </button>
         </div>
       </div>
     </div>
-  </div>
-  <div #manageDistrict class="modal fade">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Map District UID As</h5>
-        </div>
-        <div class="modal-body">
-          <div class="container-fluid">
-            <form>
-              <div *ngFor="let district of districtList; let i = index" class="form-group row">
-                <input [name]="'districtUID-' + i" [(ngModel)]="district.uid" type="text" class="form-control col-md-6"
-                  placeholder="District UID" />
-                <input [name]="'districtName-' + i" [(ngModel)]="district.name" type="text"
-                  class="form-control col-md-5" placeholder="As" />
-                <button (click)="deleteDistrict()" type="button" class="btn btn-outline-danger col">
-                  <fa name="trash"></fa>
-                </button>
-              </div>
-              <div class="form-group row">
-                <button (click)="addMore()" type="button" class="btn btn-success col-md-12">
-                  Add More District
-                </button>
-              </div>
-            </form>
+  </mat-sidenav>
+</mat-sidenav-container>
+<div #manageAccount class="modal fade">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Account</h5>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input name="username" [(ngModel)]="username" type="text" class="form-control" id="username"
+              placeholder="Username" />
           </div>
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input (change)="onChangeShowHelpOnStart()" name="showHelpOnStart" [(ngModel)]="showHelpOnStart"
+                type="checkbox" class="custom-control-input" id="showHelpOnStart" />
+              <label class="custom-control-label" for="showHelpOnStart">Show help on start</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input name="showFilterPane" [(ngModel)]="showFilterPane" type="checkbox" class="custom-control-input"
+                id="showFilterPane" />
+              <label class="custom-control-label" for="showFilterPane">Show filter pane</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button (click)="saveUsername()" type="button" class="btn btn-primary">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div #manageDistrict class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Map District UID As</h5>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <form>
+            <div *ngFor="let district of districtList; let i = index" class="form-group row">
+              <input [name]="'districtUID-' + i" [(ngModel)]="district.uid" type="text" class="form-control col-md-6"
+                placeholder="District UID" />
+              <input [name]="'districtName-' + i" [(ngModel)]="district.name" type="text" class="form-control col-md-5"
+                placeholder="As" />
+              <button (click)="deleteDistrict()" type="button" class="btn btn-outline-danger col">
+                <fa name="trash"></fa>
+              </button>
+            </div>
+            <div class="form-group row">
+              <button (click)="addMore()" type="button" class="btn btn-success col-md-12">
+                Add More District
+              </button>
+            </div>
+          </form>
         </div>
-        <div class="modal-footer">
-          <button (click)="saveDistricts()" type="button" class="btn btn-primary">
-            Save
-          </button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button (click)="saveDistricts()" type="button" class="btn btn-primary">
+          Save
+        </button>
       </div>
     </div>
   </div>

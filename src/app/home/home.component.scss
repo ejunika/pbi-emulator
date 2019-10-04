@@ -1,7 +1,38 @@
 .app-container {
     height: calc(100% - 54px);
 
-    .app-layout {
+    .screen-height {
         height: calc(100% - 30px);
+    }
+
+    .app-sidenav {
+        width: 300px;
+    }
+
+    .mr-1px {
+        margin-right: 1px;
+    }
+
+    .ml-1px {
+        margin-left: 1px;
+    }
+
+    .control-panel-toggle-btn {
+        color: #dfdfdf;
+        border-color: #dfdfdf;
+        top: -1px;
+    }
+
+    .dr {
+        right: -1px;
+    }
+
+    .dl {
+        left: -1px;
+    }
+
+    .control-panel-toggle-btn:focus {
+        outline: 0;
+        box-shadow: none;
     }
 }

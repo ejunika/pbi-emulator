@@ -5,6 +5,9 @@ import { TokenRI, IGroup, GroupRI, IReport, ReportRI, AppData, AppConfigChangeIt
 import { DataService } from './data.service';
 import { map } from 'rxjs/operators/map';
 import { Subject } from 'rxjs';
+import { LocalStorage } from '@ngx-pwa/local-storage';
+import { tap } from 'rxjs/operators';
+import { ToasterService } from 'angular2-toaster';
 
 @Injectable()
 export class AppUtilService {
@@ -14,8 +17,27 @@ export class AppUtilService {
   appConfigChangeNotifier: Subject<AppConfigChangeItem> = new Subject()
 
   constructor(
-    private dataService: DataService
+    private dataService: DataService,
+    private toasterService: ToasterService,
+    private localStorage: LocalStorage
   ) { }
+
+  saveItem(key: string, value: any): Observable<boolean> {
+    if (typeof value === 'string') {
+      value = value.trim();
+    }
+    return this.localStorage.setItem(key, value)
+      .pipe(tap((isDone: boolean) => {
+        if (isDone) {
+          this.appConfigChangeNotifier.next({ usernameChange: true });
+          this.toasterService.pop('success', 'Storage', 'Preferance saved successfully!!');
+        }
+      }));
+  }
+
+  getItem(key: string): Observable<any> {
+    return this.localStorage.getItem(key);
+  }
 
   getPowerBIService(): service.Service {
     if (!this.powerbiService) {

@@ -28,6 +28,9 @@ import { AuthService } from './auth/auth.service';
 import { AuthGuardService } from './auth/auth-guard.service';
 import { LoginGuardService } from './auth/login-guard.service';
 
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule, MatCheckboxModule } from '@angular/material';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,13 +51,16 @@ import { LoginGuardService } from './auth/login-guard.service';
     AppRoutingModule,
     LocalStorageModule,
     AngularFontAwesomeModule,
-    BrowserAnimationsModule,
     EzUtilModule,
     JwtModule.forRoot({
       config: {}
     }),
     ToasterModule.forRoot(),
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    BrowserAnimationsModule,
+    MatSidenavModule,
+    MatCheckboxModule,
+    MatButtonModule
   ],
   providers: [
     DataService,

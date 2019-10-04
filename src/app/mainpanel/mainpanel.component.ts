@@ -3,7 +3,7 @@ import { models, Page, VisualDescriptor } from 'powerbi-client';
 import { IEmbedConfiguration, IEmbedSettings } from 'embed';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
-import { IEmbedInfo, RoleType, TokenRI, ReportEvent } from '../app-models';
+import { IEmbedInfo, RoleType, TokenRI, ReportEvent, AppConfigChangeItem } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 import { Report } from 'report';
 import { ISlicerState, IBasicFilter } from 'powerbi-models';
@@ -34,6 +34,15 @@ export class MainpanelComponent implements OnInit {
     this.localStorage.getItem('showFilterPane')
       .subscribe((res: any) => {
         this.showFilterPane = res;
+      });
+    this.appUtilService.appConfigChangeNotifier
+      .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
+        if (appConfigChangeItem.showFilterPaneChange) {
+          this.appUtilService.getItem('showFilterPane')
+            .subscribe((showFilterPane: boolean) => {
+              this.showFilterPane = showFilterPane;
+            });
+        }
       });
   }
 
