@@ -35,6 +35,8 @@ export class HomeComponent implements OnInit {
 
   _showFilterPane: boolean;
 
+  _showCopyBtn: boolean;
+
   districtList: Array<any>;
 
   isOpenedSidenavLeft: boolean;
@@ -55,6 +57,17 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  set showCopyBtn(flag: boolean) {
+    this.appUtilService.saveItem('showCopyBtn', flag)
+      .pipe(tap((isDone: boolean) => {
+        if (isDone) {
+          this.appUtilService.appConfigChangeNotifier.next({ showCopyBtn: true });
+          this._showCopyBtn = flag;
+        }
+      }))
+      .subscribe();
+  }
+
   set showFilterPane(flag: boolean) {
     this.appUtilService.saveItem('showFilterPane', flag)
       .pipe(tap((isDone: boolean) => {
@@ -68,6 +81,10 @@ export class HomeComponent implements OnInit {
 
   get showFilterPane(): boolean {
     return this._showFilterPane;
+  }
+
+  get showCopyBtn(): boolean {
+    return this._showCopyBtn;
   }
 
   ngOnInit() {
@@ -84,6 +101,10 @@ export class HomeComponent implements OnInit {
     this.localStorage.getItem('showFilterPane')
       .subscribe((res) => {
         this._showFilterPane = res;
+      });
+    this.localStorage.getItem('showCopyBtn')
+      .subscribe((res) => {
+        this._showCopyBtn = res;
       });
     this.localStorage.getItem('username')
       .subscribe((username: string) => {

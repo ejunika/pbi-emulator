@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AppUtilService } from '../app-util.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +28,8 @@ export class HeaderComponent implements OnInit {
   willTokenExpireShortly: boolean;
 
   constructor(
-    private appUtilService: AppUtilService
+    private appUtilService: AppUtilService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -65,12 +67,13 @@ export class HeaderComponent implements OnInit {
       } else {
         this.reportExpiresIn = this.hhmmss(0);
         clearInterval(this.interval);
+        this.router.navigate(['login']);
       }
     }, 1000);
   }
 
-  pad(num) {
-    return ("0" + num).slice(-2);
+  pad(num: number) {
+    return ('0' + num).slice(-2);
   }
 
   hhmmss(secs) {
@@ -78,7 +81,7 @@ export class HeaderComponent implements OnInit {
     secs = secs % 60;
     var hours = Math.floor(minutes / 60)
     minutes = minutes % 60;
-    return this.pad(hours) + ":" + this.pad(minutes) + ":" + this.pad(secs);
+    return this.pad(hours) + ':' + this.pad(minutes) + ':' + this.pad(secs);
   }
 
 }

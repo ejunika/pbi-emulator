@@ -28,6 +28,7 @@ export class LeftpanelComponent implements OnInit {
   username: string;
   rlsEnabled: boolean;
   isTakenOff: boolean = false;
+  showCopyBtn: boolean = false;
 
   @Output()
   embed: EventEmitter<IEmbedInfo> = new EventEmitter();
@@ -42,6 +43,7 @@ export class LeftpanelComponent implements OnInit {
   ngOnInit() {
     this.selectedRole = <IRole>{};
     this.loadSettings();
+    this.loadCopyBtnConfig();
     this.initRoles();
     this.initGroups();
     this.appUtilService.appConfigChangeNotifier
@@ -51,9 +53,16 @@ export class LeftpanelComponent implements OnInit {
             this.updateDistrict();
           } else if (appConfigChangeItem.usernameChange) {
             this.loadSettings();
+          } else if (appConfigChangeItem.showCopyBtn) {
+            this.loadCopyBtnConfig();
           }
         }
       });
+  }
+
+  loadCopyBtnConfig(): void {
+    this.appUtilService.getItem('showCopyBtn')
+    .subscribe((flag: boolean) => this.showCopyBtn = flag);
   }
 
   loadSettings(): void {

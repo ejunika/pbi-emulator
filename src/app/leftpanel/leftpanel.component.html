@@ -1,7 +1,7 @@
 <form class="mt-2">
     <div class="form-group">
         <ez-dropdown [ddItems]="groups" [vpn]="'tenantName'" [uidpn]="'id'" [ddlText]="'Select District'"
-            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)" [copyTextEnabled]="true"
+            [selectedItem]="selectedGroup" (onItemChange)="selectGroup($event)" [copyTextEnabled]="showCopyBtn"
             [ddConfig]="{searchable: true, disabled: disableDistrictSelector}">
         </ez-dropdown>
     </div>

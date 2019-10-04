@@ -59,6 +59,7 @@ export interface AppConfigChangeItem {
     groupMappingChange?: boolean;
     usernameChange?: boolean;
     showFilterPaneChange?: boolean;
+    showCopyBtn?: boolean;
 }
 
 export interface ReportEvent {

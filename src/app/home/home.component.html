@@ -50,23 +50,31 @@
             Application Settings
           </h4>
           <form>
-            <div class="form-group">
+            <!-- <div class="form-group">
               <label for="username">Username</label>
               <input (ngModelChange)="this.usernameUpdate.next($event)" name="username" [(ngModel)]="username"
                 type="text" class="form-control" id="username" placeholder="Username" />
-            </div>
+            </div> -->
             <div class="form-group">
-              <div class="custom-control custom-checkbox">
+              <div class="custom-control custom-switch">
                 <input (change)="onChangeShowHelpOnStart()" name="showHelpOnStart" [(ngModel)]="showHelpOnStart"
                   type="checkbox" class="custom-control-input" id="showHelpOnStart" />
                 <label class="custom-control-label" for="showHelpOnStart">Show help on start</label>
               </div>
             </div>
             <div class="form-group">
-              <div class="custom-control custom-checkbox">
+              <div class="custom-control custom-switch">
                 <input name="showFilterPane" [(ngModel)]="showFilterPane" type="checkbox" class="custom-control-input"
                   id="showFilterPane" />
                 <label class="custom-control-label" for="showFilterPane">Show filter pane</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input name="showCopyBtn" type="checkbox" [(ngModel)]="showCopyBtn" class="custom-control-input" id="showCopyBtn" />
+                <label class="custom-control-label" for="showCopyBtn">
+                  Show copy button
+                </label>
               </div>
             </div>
             <button (click)="openManageDistrictModal()" class="btn btn-primary btn-sm">Map District</button>
