@@ -97,6 +97,7 @@ export class MainpanelComponent implements OnInit {
               powerbiService.reset(reportContainer);
               let report = <Report>powerbiService.embed(reportContainer, config);
               if (report) {
+                window['report'] = report;
                 const reportEvents: Array<ReportEvent> = [
                   { name: 'rendered', handler: this.onReportRendered.bind(this, report) },
                   { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }

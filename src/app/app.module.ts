@@ -30,6 +30,9 @@ import { LoginGuardService } from './auth/login-guard.service';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule, MatCheckboxModule } from '@angular/material';
+import { ScriptEditorComponent } from './script-editor/script-editor.component';
+import { AceComponent } from './ace/ace.component';
+import { ScriptLoaderService } from './script-loader.service';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,9 @@ import { MatButtonModule, MatCheckboxModule } from '@angular/material';
     LeftpanelComponent,
     MainpanelComponent,
     LoginComponent,
-    HelpComponent
+    HelpComponent,
+    ScriptEditorComponent,
+    AceComponent
   ],
   entryComponents: [
     LeftpanelComponent
@@ -72,6 +77,7 @@ import { MatButtonModule, MatCheckboxModule } from '@angular/material';
     AuthGuardService,
     LoginGuardService,
     GroupService,
+    ScriptLoaderService,
     localStorageProviders({ prefix: 'myapp' }),
     {
       provide: HTTP_INTERCEPTORS,

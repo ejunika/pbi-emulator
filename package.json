@@ -25,6 +25,7 @@
     "@angular/router": "^5.2.5",
     "@auth0/angular-jwt": "^3.0.0",
     "@ngx-pwa/local-storage": "^5.3.0",
+    "ace-builds": "^1.4.6",
     "angular-font-awesome": "^3.1.2",
     "angular2-toaster": "^5.1.0",
     "animate.css": "^3.7.2",

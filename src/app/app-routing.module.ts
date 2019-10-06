@@ -3,10 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { HelpComponent } from './help/help.component';
-import { ConfirmDialogService } from './confirm-dialog.service';
 import { AppResolverService } from './app-resolver.service';
 import { AuthGuardService } from './auth/auth-guard.service';
 import { LoginGuardService } from './auth/login-guard.service';
+import { ScriptEditorComponent } from './script-editor/script-editor.component';
 
 const routes: Routes = [
   {
@@ -28,14 +28,16 @@ const routes: Routes = [
     canActivate: [AuthGuardService]
   },
   {
-    path: 'help',
-    component: HelpComponent,
+    path: 'home/script-editor',
+    component: ScriptEditorComponent,
     resolve: {
       appResolverService: AppResolverService
     },
-    canActivate: [
-      AuthGuardService
-    ]
+    canActivate: [AuthGuardService]
+  },
+  {
+    path: 'help',
+    component: HelpComponent
   }
 ];
 
