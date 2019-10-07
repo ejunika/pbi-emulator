@@ -17,20 +17,17 @@ export class HelpComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.localStorage.getItem('dontShowNextTime').subscribe(dontShowNextTime => {
-      if (dontShowNextTime) {
-        this.router.navigate(['home']);
-      }
-    });
+
   }
 
   start(): void {
     if (this.dontShowNextTime) {
-      this.localStorage.setItem('dontShowNextTime', true).subscribe(res => {
-        if (res) {
-          this.router.navigate(['home']);
-        }
-      });
+      this.localStorage.setItem('dontShowNextTime', true)
+        .subscribe((isDone: boolean) => {
+          if (isDone) {
+            this.router.navigate(['home']);
+          }
+        });
     }
   }
 

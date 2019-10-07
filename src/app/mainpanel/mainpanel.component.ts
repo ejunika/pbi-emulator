@@ -1,10 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, EventEmitter, Output } from '@angular/core';
-import { service, factories, models, Report } from 'powerbi-client';
-import { parse } from 'papaparse';
-import { DataService } from '../data.service';
-import { IEmbedConfiguration, ISettings } from 'embed';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { models, Page, VisualDescriptor } from 'powerbi-client';
+import { IEmbedConfiguration, IEmbedSettings } from 'embed';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
+import { IEmbedInfo, RoleType, TokenRI, ReportEvent, AppConfigChangeItem } from '../app-models';
+import { AppUtilService } from '../app-util.service';
+import { Report } from 'report';
+import { ISlicerState, IBasicFilter } from 'powerbi-models';
 
 @Component({
   selector: 'app-mainpanel',
@@ -12,154 +14,103 @@ import { ToasterService } from 'angular2-toaster';
   styleUrls: ['./mainpanel.component.scss']
 })
 export class MainpanelComponent implements OnInit {
-
   @ViewChild('pbiContainer')
   pbiContainer: ElementRef;
-
-  @Output('onCountdownStart')
-  onCountdownStart: EventEmitter<number> = new EventEmitter<number>();
 
   selectedStudents: Array<any>;
 
   countDownSeconds: number;
 
+  showFilterPane: boolean;
+
   constructor(
-    private dataService: DataService,
     private localStorage: LocalStorage,
-    private toasterService: ToasterService
+    private toasterService: ToasterService,
+    private appUtilService: AppUtilService
   ) { }
 
   ngOnInit(): void {
     this.selectedStudents = [];
+    this.localStorage.getItem('showFilterPane')
+      .subscribe((res: any) => {
+        this.showFilterPane = res;
+      });
+    this.appUtilService.appConfigChangeNotifier
+      .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
+        if (appConfigChangeItem.showFilterPaneChange) {
+          this.appUtilService.getItem('showFilterPane')
+            .subscribe((showFilterPane: boolean) => {
+              this.showFilterPane = showFilterPane;
+            });
+        }
+      });
   }
 
-  onEmbed(e): void {
-    let group = e.group;
-    let report = e.report;
-    let applyRLS = e.applyRLS;
-    let customData;
-    let role;
+  onEmbed(embedInfo: IEmbedInfo): void {
+    let group = embedInfo.group;
+    let report = embedInfo.report;
+    let applyRLS = embedInfo.applyRLS;
+    let customData: string;
+    let role: RoleType;
     if (applyRLS) {
-      customData = e.customData;
-      role = e.role;
+      customData = embedInfo.customData;
+      role = embedInfo.role;
     }
     this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role);
   }
 
-  updateSelectedStudents(students: Array<any>): void {
-    this.selectedStudents = [];
-    for (let i = 0; i < students.length; i++) {
-      this.selectedStudents.push({
-        studentName: students[i].identity[0].equals,
-        background: this.getClass()
-      });
-    }
-  }
-
-  createGroup(): void {
-
-  }
-
-  initDataSelectListner(): void {
-    const powerbi = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
-    const reportContainer = this.pbiContainer.nativeElement;
-    const report = powerbi.get(reportContainer);
-    report.off('dataSelected');
-    report.on('dataSelected', (e) => {
-      const detail: any = e.detail;
-      debugger;
-      if (detail.visual.name === '9cf4ef6cbed7d87040c0') {
-        this.updateSelectedStudents(detail['dataPoints']);
-      }
-    });
-  }
-
-  embed(groupId, reportId, datasetId, embedUrl, applyRls?, customData?, role?): void {
-    this.localStorage.getItem('username').subscribe(username => {
-      const settings: IEmbedConfigurationSettings = {
-        filterPaneEnabled: false
-      };
-      let reqData: any = {
-        accessLevel: 'view'
-      };
-      if (applyRls) {
-        reqData.identities = [
-          {
-            username: username,
-            customData: customData,
-            roles: [role],
-            datasets: [datasetId]
-          }
-        ]
-      }
-      this.dataService.post(reqData, 'myorg', ['groups', groupId, 'reports', reportId, 'GenerateToken']).subscribe((res) => {
-        let currentISO = new Date().toISOString();
-        let currentTime = Date.parse(currentISO);
-        let expiration = Date.parse(res.expiration);
-        let countdownSeconds = (expiration - currentTime) / 1000;
-        this.onCountdownStart.emit(countdownSeconds);
-        const config: IEmbedConfiguration = {
-          type: 'report',
-          accessToken: res.token,
-          embedUrl: embedUrl,
-          tokenType: models.TokenType.Embed,
-          settings: settings
+  embed(groupId: string, reportId: string, datasetId: string, embedUrl: string, applyRls?: boolean, customData?: string, role?: string): void {
+    this.localStorage.getItem('username')
+      .subscribe((username: string) => {
+        let settings: IEmbedSettings = {
+          filterPaneEnabled: this.showFilterPane
         };
-        const powerbi = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
-        const reportContainer = this.pbiContainer.nativeElement;
-        if (reportContainer) {
-          powerbi.reset(reportContainer);
-          const report = <Report>powerbi.embed(reportContainer, config);
-          if (report) {
-            report.off('loaded');
-            report.on('loaded', () => {
-              this.toasterService.pop('info', 'Reports', 'Report loaded');
-            });
-            report.off('rendered');
-            report.on('rendered', () => {
-              this.toasterService.pop('success', 'Reports', 'Report rendered');
-            });
-          }
+        let reqData: any = {
+          accessLevel: 'view'
+        };
+        if (applyRls) {
+          reqData.identities = [
+            {
+              username: username,
+              customData: customData,
+              roles: [role],
+              datasets: [datasetId]
+            }
+          ];
         }
-      });
-    });
-  }
-
-  getSelectedStudent(): void {
-    this.checkForUnderlayingData();
-  }
-
-  checkForUnderlayingData(): void {
-    const powerbi = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
-    const reportContainer = this.pbiContainer.nativeElement;
-    const report = <Report>powerbi.get(reportContainer);
-    report.getPages().then((pages) => {
-      let activePage = pages.find((page) => page.isActive);
-      activePage.getVisuals().then((visuals) => {
-        // let visual = visuals.find((visual) => visual.name == "41c8fb229814d771992d"); // Student List (Table)
-        let visual = visuals.find((visual) => visual.name == "ba94b278491cb08c1ab1"); // StudentID (Table)
-        // let visual = visuals.find((visual) => visual.name == "9cf4ef6cbed7d87040c0"); // Student List (Slicer)
-        // let visual = visuals.find((visual) => visual.name == "9cf4ef6cbed7d87040c0"); //
-        // let visual = visuals.find((visual) => visual.name == "dfc271fa4cbd997d0291"); // By School
-        visual.exportData(models.ExportDataType.Summarized).then((result) => {
-          let csvData = result['data']; // We will get CSV data
-          let data = parse(csvData, {
-            complete: (parseResult, file) => {
-              console.log('[Summarized Data]: ', parseResult);
-            },
-            error: (error, file) => { },
-            skipEmptyLines: true
+        this.appUtilService.getReportEmbedToken(reqData, groupId, reportId)
+          .subscribe((tokenRI: TokenRI) => {
+            let config: IEmbedConfiguration = {
+              type: 'report',
+              accessToken: tokenRI.token,
+              embedUrl: embedUrl,
+              tokenType: models.TokenType.Embed,
+              settings: settings
+            };
+            let defaultPageName = this.getDefaultPageName();
+            if (defaultPageName) {
+              config.pageName = defaultPageName;
+            }
+            let powerbiService = this.appUtilService.getPowerBIService();
+            let reportContainer = this.pbiContainer.nativeElement;
+            if (reportContainer) {
+              powerbiService.reset(reportContainer);
+              let report = <Report>powerbiService.embed(reportContainer, config);
+              if (report) {
+                window['report'] = report;
+                const reportEvents: Array<ReportEvent> = [
+                  { name: 'rendered', handler: this.onReportRendered.bind(this, report) },
+                  { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }
+                ];
+                this.appUtilService.addEventsToReport(report, reportEvents);
+              }
+            }
           });
-          //this.selectedStudents = result['data'];
-        }).catch((errors) => {
-          console.error(errors);
-        });
-      }).catch((errors) => {
-        console.error(errors);
       });
-    }).catch((errors) => {
-      console.error(errors);
-    });
+  }
+
+  getDefaultPageName(): string {
+    return 'ReportSectionTeacher';
   }
 
   getRandomInt(min: number, max: number): number {
@@ -170,13 +121,43 @@ export class MainpanelComponent implements OnInit {
     return Math.random() * (max - min) + min;
   }
 
-  getClass(): String {
-    const classes = 'primary, secondary, success, danger, warning, info, light, dark'.split(', ');
+  getClass(): string {
+    let classes = 'primary, secondary, success, danger, warning, info, light, dark'.split(', ');
     return 'badge-' + classes[this.getRandomInt(0, 7)];
   }
 
-}
+  private onReportRendered(report: Report, customEvent: CustomEvent): void {
+    console.log('Report Rendered');
+  }
 
-interface IEmbedConfigurationSettings extends ISettings {
-  filterPaneEnabled?: boolean;
+  private onReportLoaded(report: Report, customEvent: CustomEvent): void {
+    console.log('Report Loaded');
+    setTimeout(() => {
+      report.getPages()
+        .then((pages: Array<Page>) => {
+          console.log('[Info]', pages);
+          let page = pages.find((page: Page) => page.name === 'ReportSectionTeacher' && page.isActive === true);
+          if (page) {
+            page.getVisuals().then((visuals: Array<VisualDescriptor>) => {
+              let slicerVisual = visuals.find((visual: VisualDescriptor) => visual.title === 'CalendarDateFilter');
+              if (slicerVisual) {
+                return slicerVisual.getSlicerState().then((state: ISlicerState) => {
+                  let monthFilter = <IBasicFilter>state.filters[0];
+                  if (monthFilter && monthFilter.values.indexOf('Sep-2019') === -1) {
+                    monthFilter.values = ['Sep-2019'];
+                    return slicerVisual.setSlicerState(state);
+                  } else {
+                    throw new Error(`Either the Slicer doesn't have filter or the filter is already applied`);
+                  }
+                });
+              }
+            });
+          } else {
+            throw new Error('NoSuchPageActiveError');
+          }
+        });
+      this.toasterService.pop('success', 'Reports', 'Report Loaded')
+    });
+  }
+
 }

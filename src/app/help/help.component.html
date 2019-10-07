@@ -1,34 +1,35 @@
-<div class="jumbotron">
+<div class="jumbotron h-100 mb-0">
   <h2>What is this?</h2>
   <p>
-    This is an emulator to test the embeded report of Power BI. Here you can test the embed report with or without
-    apply the RLS (Row Level Security).
+    This is an emulator to test the embedded report of Power BI. Here you can test the embed report with or without
+    applying the RLS (Row Level Security).
   </p>
   <h2>Prerequisite</h2>
   <p>
-    For security resions we are not handling the user Authentication & Authorization process. There for you need to
-    have a client, which can login to Power BI and get you back the Azure Access Token. I'll recoment <strong>Postman</strong>
-    for Authentication steps.
+    For security reasons, we are not handling user Authentication, and so you need to have a client, which can log in to
+    Power BI and get you back the Azure Access Token. <strong>Postman</strong> is the recommended client for
+    Authentication steps.
   </p>
   <h2>How to use the emulator?</h2>
   <p>
     For getting started with the emulator follow the steps mentioned below.
   </p>
   <ol>
-    <li>Login to the Power BI using <strong>Postman</strong> and get the <strong>access token</strong></li>
-    <li>Click on <strong>Manage Token</strong> menu, provide the access token and save it</li>
-    <li>Click on <strong>Manage Account</strong> menu, provide the <strong>username</strong> and save it</li>
+    <li>
+      Log in to the Power BI using Postman and get the access token and you are ready to use this application.
+    </li>
+    <li>
+      Use the access token to log in to the application.
+    </li>
+    <li>
+      After a successful login, you will be redirected to the home page of the application.
+    </li>
   </ol>
   <p>
     And now you are ready to go.
   </p>
-  <form>
-    <div class="form-group">
-      <div class="custom-control custom-checkbox">
-        <input name="dontShowNextTime" [(ngModel)]="dontShowNextTime" type="checkbox" class="custom-control-input" id="dontShowNextTime">
-        <label class="custom-control-label" for="dontShowNextTime">Don't show next time</label>
-      </div>
-    </div>
-    <button (click)="start()" class="btn btn-primary">Start</button>
-  </form>
+  <button (click)="start()" class="btn btn-primary">
+    All the best
+    <fa class="ml-1" name="thumbs-up"></fa>
+  </button>
 </div>

@@ -36,14 +36,14 @@ export class DataService {
     let formUrlData = '';
     if (data) {
       for (let key in data) {
-        formUrlData += encodeURIComponent(key)+"="+encodeURIComponent(data[key])+"&";
+        formUrlData += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
       }
     }
     return formUrlData
   }
 
   buildBaseUrl(): string {
-    let baseUrl;
+    let baseUrl: string;
     if (this.serverConfig) {
       if (this.serverConfig.sslEnabled) {
         baseUrl = 'https://';
@@ -87,7 +87,7 @@ export class DataService {
         }
       }
       if (url.lastIndexOf('&') === url.length - 1) {
-        url = url.substr(0, url.length -  1);
+        url = url.substr(0, url.length - 1);
       }
     }
     if (!url.startsWith('http')) {
@@ -96,8 +96,8 @@ export class DataService {
     return url;
   }
 
-  get(url: string, urlParams?: string | string[], searchParams?: {}): Observable<any> {
-    return this.http.get<any>(this.buildUrl(url, urlParams, searchParams));
+  get<T>(url: string, urlParams?: string | string[], searchParams?: {}): Observable<T> {
+    return this.http.get<T>(this.buildUrl(url, urlParams, searchParams));
   }
 
 }

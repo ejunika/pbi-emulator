@@ -1,0 +1,17 @@
+<div class="accordion" [id]="accordion.id">
+  <div *ngFor="let panel of accordion?.panels; let i = index" class="card">
+    <div [id]="'heading-' + panel.id">
+      <button [ngClass]="{ 'collapsed': i !== 0 }" class="btn btn-block btn-light" type="button" data-toggle="collapse"
+        [attr.data-target]="'#collapse-' + panel.id" [attr.aria-expanded]="i === 0"
+        [attr.aria-controls]="'collapse-' + panel.id">
+        {{ panel.headerText }}
+      </button>
+    </div>
+    <div [id]="'collapse-' + panel.id" class="collapse" [ngClass]="{ 'show': i === 0 }"
+      [attr.aria-labelledby]="'heading-' + panel.id" [attr.data-parent]="'#' + accordion.id">
+      <div class="card-body">
+        <ng-container *ngComponentOutlet="panel.body"></ng-container>
+      </div>
+    </div>
+  </div>
+</div>

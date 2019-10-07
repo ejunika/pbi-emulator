@@ -1,4 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { AppUtilService } from '../app-util.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -23,10 +25,17 @@ export class HeaderComponent implements OnInit {
 
   interval: any;
 
-  constructor() { }
+  willTokenExpireShortly: boolean;
+
+  constructor(
+    private appUtilService: AppUtilService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.reportExpiresIn = '00:00:00';
+    this.willTokenExpireShortly = false;
+    this.onCountdownStart(this.appUtilService.appData.countDownSeconds)
   }
 
   openMangeAccountModal(): void {
@@ -41,26 +50,30 @@ export class HeaderComponent implements OnInit {
     this.onClickManageDistrict.emit();
   }
 
-  onCountdownStart(countdownSeconds): void {
-    countdownSeconds = parseInt(countdownSeconds);
+  onCountdownStart(countdownSeconds: number): void {
+    let wholeCountdownSeconds = parseInt(countdownSeconds.toString());
     this.reportExpiresIn = this.hhmmss(0);
     if (this.interval) {
       clearInterval(this.interval);
     }
     this.showTimer = true;
     this.interval = setInterval(() => {
-      --countdownSeconds;
-      if (countdownSeconds > 0) {
-        this.reportExpiresIn = this.hhmmss(countdownSeconds);
+      --wholeCountdownSeconds;
+      if (wholeCountdownSeconds <= 60) {
+        this.willTokenExpireShortly = true;
+      }
+      if (wholeCountdownSeconds > 0) {
+        this.reportExpiresIn = this.hhmmss(wholeCountdownSeconds);
       } else {
         this.reportExpiresIn = this.hhmmss(0);
         clearInterval(this.interval);
+        this.router.navigate(['login']);
       }
     }, 1000);
   }
 
-  pad(num) {
-    return ("0" + num).slice(-2);
+  pad(num: number) {
+    return ('0' + num).slice(-2);
   }
 
   hhmmss(secs) {
@@ -68,7 +81,7 @@ export class HeaderComponent implements OnInit {
     secs = secs % 60;
     var hours = Math.floor(minutes / 60)
     minutes = minutes % 60;
-    return this.pad(hours) + ":" + this.pad(minutes) + ":" + this.pad(secs);
+    return this.pad(hours) + ':' + this.pad(minutes) + ':' + this.pad(secs);
   }
 
 }

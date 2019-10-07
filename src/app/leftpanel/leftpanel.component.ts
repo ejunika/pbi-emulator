@@ -1,8 +1,9 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { DataService } from '../data.service';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
+import { AppUtilService } from '../app-util.service';
 
 @Component({
   selector: 'app-leftpanel',
@@ -11,47 +12,67 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 })
 export class LeftpanelComponent implements OnInit {
 
-  groups: Array<any>;
-  reports: Array<any>;
-  roles: Array<any>;
+  groups: Array<IGroup>;
+  reports: Array<IReport>;
+  roles: Array<IRole>;
 
-  selectedGroup: any;
-  selectedReport: any;
+  selectedGroup: IGroup;
+  selectedReport: IReport;
 
   disableDistrictSelector: boolean = true;
   disableDashboardSelector: boolean = true;
 
   applyRLS: boolean;
-  viewDisabled: boolean = true;
   customData: string = '';
-  selectedRole: any;
+  selectedRole: IRole;
   username: string;
   rlsEnabled: boolean;
+  isTakenOff: boolean = false;
+  showCopyBtn: boolean = false;
 
   @Output()
-  embed: EventEmitter<any> = new EventEmitter();
+  embed: EventEmitter<IEmbedInfo> = new EventEmitter();
 
   constructor(
-    private dataService: DataService,
+    private appUtilService: AppUtilService,
     private groupService: GroupService,
     private toasterService: ToasterService,
     private localStorage: LocalStorage
   ) { }
 
   ngOnInit() {
-    this.selectedRole = {};
+    this.selectedRole = <IRole>{};
     this.loadSettings();
+    this.loadCopyBtnConfig();
     this.initRoles();
     this.initGroups();
+    this.appUtilService.appConfigChangeNotifier
+      .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
+        if (appConfigChangeItem) {
+          if (appConfigChangeItem.groupMappingChange) {
+            this.updateDistrict();
+          } else if (appConfigChangeItem.usernameChange) {
+            this.loadSettings();
+          } else if (appConfigChangeItem.showCopyBtn) {
+            this.loadCopyBtnConfig();
+          }
+        }
+      });
+  }
+
+  loadCopyBtnConfig(): void {
+    this.appUtilService.getItem('showCopyBtn')
+    .subscribe((flag: boolean) => this.showCopyBtn = flag);
   }
 
   loadSettings(): void {
     this.rlsEnabled = false;
-    this.localStorage.getItem('username').subscribe(username => {
-      if (username) {
-        this.rlsEnabled = true;
-      }
-    });
+    this.localStorage.getItem('username')
+      .subscribe((username: string) => {
+        if (username) {
+          this.rlsEnabled = true;
+        }
+      });
   }
 
   initRoles(): void {
@@ -67,66 +88,60 @@ export class LeftpanelComponent implements OnInit {
     ];
   }
 
-  onChangeGroup(group: any) {
+  onChangeGroup(group: IGroup) {
     this.initReports(group.id);
   }
 
-  selectGroup(group: any) {
+  selectGroup(group: IGroup) {
     this.selectedGroup = group;
     this.initReports(group.id);
   }
 
-  onChangeReport(): void {
-    if (this.selectedReport.name) {
-      this.viewDisabled = false;
-    } else {
-      this.viewDisabled = true;
-    }
-  }
-
-  selectReport(report: any) {
+  selectReport(report: IReport) {
     this.selectedReport = report;
-    if (this.selectedReport.name) {
-      this.viewDisabled = false;
-    } else {
-      this.viewDisabled = true;
-    }
-  }
-
-  onChangeApplyRLS(applyRLS: boolean): void {
-
+    this.isTakenOff = false;
   }
 
   viewDashboard(): void {
-    this.embed.emit({
+    let embedInfo: IEmbedInfo = {
       group: this.selectedGroup,
       report: this.selectedReport,
       applyRLS: this.applyRLS,
       customData: this.applyRLS ? this.customData : '',
       role: this.applyRLS ? this.selectedRole.dex : ''
-    });
+    };
+    this.embed.emit(embedInfo);
+    this.isTakenOff = true;
   }
 
   initGroups(): void {
-    this.dataService.get('myorg', ['groups']).subscribe((res) => {
-      this.groups = this.groupService.transform(res.value);
-      if (this.groups.length > 0) {
-        this.disableDistrictSelector = false;
-      }
+    this.appUtilService.getGroups()
+      .subscribe((groups: Array<IGroup>) => {
+        this.groups = this.groupService.transform(groups);
+        if (this.groups.length > 0) {
+          this.disableDistrictSelector = false;
+        }
+      });
+  }
+
+  updateDistrict(): void {
+    this.groupService.initTenantMap().subscribe(() => {
+      this.groups = this.groupService.transform(this.groups);
     });
   }
 
   initReports(groupId: string): void {
-    this.selectedReport = {};
+    this.selectedReport = <IReport>{};
     this.disableDashboardSelector = true;
-    this.dataService.get('myorg', ['groups', groupId, 'reports']).subscribe((res) => {
-      this.reports = res.value;
-      if (this.reports.length > 0) {
-        this.disableDashboardSelector = false;
-      } else {
-        this.toasterService.pop('info', 'Reports', 'No report found in this district');
-      }
-    });
+    this.appUtilService.getReports(groupId)
+      .subscribe((reports: Array<IReport>) => {
+        this.reports = reports;
+        if (this.reports.length > 0) {
+          this.disableDashboardSelector = false;
+        } else {
+          this.toasterService.pop('info', 'Reports', 'No report found in this district');
+        }
+      });
   }
 
 }
