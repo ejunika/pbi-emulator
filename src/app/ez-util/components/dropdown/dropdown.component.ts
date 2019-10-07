@@ -4,6 +4,9 @@ import { DropdownConfig } from './dropdown-config';
 import { DropdownEvent } from 'bootstrap';
 import * as _ from 'lodash';
 import { DOCUMENT } from '@angular/common';
+import { Observable, Subject } from 'rxjs';
+import { map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { FilterPipe } from '../../pipes/filter.pipe';
 
 declare const $: any;
 const DD_ON_SHOW: DropdownEvent = 'show.bs.dropdown';
@@ -18,6 +21,8 @@ export class DropdownComponent implements OnInit {
   selectedItem: DropdownItem;
 
   searchText: string;
+
+  searchTextChange = new Subject<string>();
 
   @Input('ddItems')
   ddItems: Array<DropdownItem>;
@@ -52,7 +57,8 @@ export class DropdownComponent implements OnInit {
   searchTextInput: ElementRef;
 
   constructor(
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private filter: FilterPipe
   ) { }
 
   ngOnInit() {
@@ -70,19 +76,30 @@ export class DropdownComponent implements OnInit {
   }
 
   initListeners(): void {
-    $(this.ezDropdown.nativeElement).on(DD_ON_SHOW, e => {
-      setTimeout(() => {
-        if (this.searchTextInput) {
-          $(this.searchTextInput.nativeElement).focus();
-          this.searchText = '';
-        }
-      }, 0);
-    });
+    $(this.ezDropdown.nativeElement)
+      .on(DD_ON_SHOW, (e: Event) => {
+        setTimeout(() => {
+          if (this.searchTextInput) {
+            $(this.searchTextInput.nativeElement).val('').focus();
+            this.searchText = '';
+          }
+        }, 0);
+      });
+    this.searchTextChange.pipe(map((searchText: string) => searchText.toLowerCase()),
+      debounceTime(500),
+      distinctUntilChanged())
+      .subscribe((searchText: string) => {
+        this.searchText = searchText;
+      });
   }
 
   copyText(copierInput: HTMLInputElement): void {
     copierInput.select();
     this.document.execCommand('copy');
+  }
+
+  onSearchTextChange(searchText: string): void {
+    this.searchTextChange.next(searchText);
   }
 
 }

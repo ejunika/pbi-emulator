@@ -33,6 +33,7 @@ import { MatButtonModule, MatCheckboxModule } from '@angular/material';
 import { ScriptEditorComponent } from './script-editor/script-editor.component';
 import { AceComponent } from './ace/ace.component';
 import { ScriptLoaderService } from './script-loader.service';
+import { FilterPipe } from './ez-util/pipes/filter.pipe';
 
 @NgModule({
   declarations: [
@@ -78,6 +79,7 @@ import { ScriptLoaderService } from './script-loader.service';
     LoginGuardService,
     GroupService,
     ScriptLoaderService,
+    FilterPipe,
     localStorageProviders({ prefix: 'myapp' }),
     {
       provide: HTTP_INTERCEPTORS,
