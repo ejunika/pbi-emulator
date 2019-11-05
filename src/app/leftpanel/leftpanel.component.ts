@@ -2,9 +2,9 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem, RoleType } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
 import { AppUtilService } from '../app-util.service';
-import { Router, Params } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-leftpanel',
