@@ -5,13 +5,10 @@
   <mat-sidenav #sidenavLeft mode="side" [(opened)]="isOpenedSidenavLeft">
     <div class="app-sidenav mr-1px h-100">
       <div class="card h-100">
-        <div class="card-body">
+        <div class="card-body overflow-auto">
           <h4 class="card-title">
             Control Pannel
           </h4>
-          <h6 class="card-subtitle mb-2 text-muted">
-            Select the 'District' & 'Report'
-          </h6>
           <app-leftpanel #leftPanel (embed)="mainPanel.onEmbed($event)"></app-leftpanel>
         </div>
         <div class="card-footer d-flex">

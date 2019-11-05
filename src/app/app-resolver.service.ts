@@ -22,11 +22,7 @@ export class AppResolverService implements Resolve<AppData> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppData> | Promise<AppData> | AppData {
     const appData = new AppData();
-    appData.currentGroupId = route.params.groupId;
-    appData.currentReportId = route.params.reportId;
-    appData.hasRLS = (() => route.queryParams.hasRLS && 'true' === route.queryParams.hasRLS.toLowerCase())();
-    appData.cd = route.queryParams.cd ? decodeURIComponent(route.queryParams.cd) : '';
-    appData.role = route.queryParams.role;
+    this.updateAppData(appData, route);
     return forkJoin([this.getTokenRemainingSeconds()
       .pipe(map((countDownSeconds: number) => {
         appData.countDownSeconds = countDownSeconds;
@@ -70,6 +66,14 @@ export class AppResolverService implements Resolve<AppData> {
     const currentTime = Date.parse(currentISO);
     const expiration = Date.parse(utfTimeStamp);
     return (expiration - currentTime) / 1000;
+  }
+
+  updateAppData(appData: AppData, route: ActivatedRouteSnapshot): void {
+    appData.currentGroupId = route.params.groupId;
+    appData.currentReportId = route.params.reportId;
+    appData.hasRLS = (() => route.queryParams.hasRLS && 'true' === route.queryParams.hasRLS.toLowerCase())();
+    appData.cd = route.queryParams.cd ? decodeURIComponent(route.queryParams.cd) : '';
+    appData.role = route.queryParams.role;
   }
 
 }
