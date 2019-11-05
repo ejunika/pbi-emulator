@@ -8,6 +8,8 @@ import { map } from 'rxjs/operators';
 export class GroupService {
 
   tenantMap = new Map<string, string>();
+  cachedGroups: Array<IGroup>;
+  hasGroups: boolean = false;
 
   constructor(
     private localStorage: LocalStorage
@@ -33,8 +35,18 @@ export class GroupService {
         group.tenantName = this.tenantMap.get(group.name) || group.name;
         return group;
       });
+      if (mappedGroups.length > 0) {
+        this.hasGroups = true;
+      } else {
+        this.hasGroups = false;
+      }
+      this.cachedGroups = mappedGroups;
       return mappedGroups.sort((a: IGroup, b: IGroup) => b.tenantName.localeCompare(a.tenantName));
     }
+  }
+
+  getCachedGroup(): Array<IGroup> {
+    return this.cachedGroups || [];
   }
 
 }

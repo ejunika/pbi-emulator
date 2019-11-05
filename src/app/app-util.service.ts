@@ -8,6 +8,7 @@ import { Subject } from 'rxjs';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { tap } from 'rxjs/operators';
 import { ToasterService } from 'angular2-toaster';
+import { Params } from '@angular/router';
 
 @Injectable()
 export class AppUtilService {
@@ -75,6 +76,14 @@ export class AppUtilService {
         report.on(event.name, event.handler);
       });
     }
+  }
+
+  getQueryParams(): Params {
+    return {
+      hasRLS: this.appData.hasRLS,
+      cd: encodeURIComponent(this.appData.cd),
+      role: this.appData.role
+    };
   }
 
 }

@@ -12,7 +12,7 @@ const LANG = 'ace/mode/javascript';
   template: `
     <div #editor id="editor"></div>
   `,
-  styles: ['#editor { height: 300px; width: 100% }']
+  styles: ['#editor { height: 500px; width: 100% }']
 })
 export class AceComponent implements OnInit {
 

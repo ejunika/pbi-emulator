@@ -13,18 +13,20 @@
     </div>
     <div class="form-group">
         <div *ngIf="rlsEnabled" class="custom-control custom-checkbox">
-            <input name="applyRLS" [(ngModel)]="applyRLS" type="checkbox" class="custom-control-input" id="applyRLS" />
+            <input (change)="appUtilService.appData.hasRLS = applyRLS" name="applyRLS" [(ngModel)]="applyRLS"
+                type="checkbox" class="custom-control-input" id="applyRLS" />
             <label class="custom-control-label" for="applyRLS">Apply RLS</label>
         </div>
     </div>
     <div *ngIf="applyRLS" class="form-group">
         <label for="customData">Custom Data</label>
-        <input name="customData" [(ngModel)]="customData" type="text" class="form-control" id="customData"
-            placeholder="Custom Data" />
+        <input name="customData" (change)="appUtilService.appData.cd = customData" [(ngModel)]="customData" type="text"
+            class="form-control" id="customData" placeholder="Custom Data" />
     </div>
     <div *ngIf="applyRLS" class="form-group">
         <ez-dropdown [ddItems]="roles" [vpn]="'name'" [uidpn]="'name'" [selectedItem]="selectedRole"
-            [ddlText]="'Select Role'" [ddConfig]="{ disabled: customData === '' }">
+            (onItemChange)="appUtilService.appData.role = $event.dex" [ddlText]="'Select Role'"
+            [ddConfig]="{ disabled: customData === '' }">
         </ez-dropdown>
     </div>
     <button [disabled]="!this.selectedGroup?.id || !this.selectedReport?.id" (click)="viewDashboard()" type="button"

@@ -3,6 +3,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class AuthService {

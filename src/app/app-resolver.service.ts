@@ -22,6 +22,11 @@ export class AppResolverService implements Resolve<AppData> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppData> | Promise<AppData> | AppData {
     const appData = new AppData();
+    appData.currentGroupId = route.params.groupId;
+    appData.currentReportId = route.params.reportId;
+    appData.hasRLS = (() => route.queryParams.hasRLS && 'true' === route.queryParams.hasRLS.toLowerCase())();
+    appData.cd = route.queryParams.cd ? decodeURIComponent(route.queryParams.cd) : '';
+    appData.role = route.queryParams.role;
     return forkJoin([this.getTokenRemainingSeconds()
       .pipe(map((countDownSeconds: number) => {
         appData.countDownSeconds = countDownSeconds;

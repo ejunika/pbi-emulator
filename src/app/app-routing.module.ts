@@ -15,12 +15,33 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'go',
+    redirectTo: '/home',
+    pathMatch: 'full'
+  },
+  {
     path: 'login',
     component: LoginComponent,
     canActivate: [LoginGuardService]
   },
   {
     path: 'home',
+    component: HomeComponent,
+    resolve: {
+      appResolverService: AppResolverService
+    },
+    canActivate: [AuthGuardService]
+  },
+  {
+    path: 'go/:groupId',
+    component: HomeComponent,
+    resolve: {
+      appResolverService: AppResolverService
+    },
+    canActivate: [AuthGuardService]
+  },
+  {
+    path: 'go/:groupId/reports/:reportId',
     component: HomeComponent,
     resolve: {
       appResolverService: AppResolverService

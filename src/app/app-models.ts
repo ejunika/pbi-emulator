@@ -53,6 +53,11 @@ export interface IRole {
 
 export class AppData {
     countDownSeconds: number;
+    currentGroupId: string;
+    currentReportId: string;
+    hasRLS: boolean;
+    cd: string;
+    role: RoleType;
 }
 
 export interface AppConfigChangeItem {
@@ -60,6 +65,8 @@ export interface AppConfigChangeItem {
     usernameChange?: boolean;
     showFilterPaneChange?: boolean;
     showCopyBtn?: boolean;
+    groupChange?: boolean;
+    reportChange?: boolean;
 }
 
 export interface ReportEvent {

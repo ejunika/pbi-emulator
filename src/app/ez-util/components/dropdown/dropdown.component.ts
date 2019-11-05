@@ -47,7 +47,7 @@ export class DropdownComponent implements OnInit {
 
   @Input('selectedItem')
   set _selectedItem(item: DropdownItem) {
-    this.selectedItem = item;
+    this.selectedItem = item || {};
   }
 
   @ViewChild('ezDropdown')
@@ -70,7 +70,7 @@ export class DropdownComponent implements OnInit {
 
   selectItem(item: DropdownItem): void {
     if (this.selectedItem) {
-      _.extend(this.selectedItem, item);
+      this.selectedItem = _.clone(item);
     }
     this.onItemChange.emit(this.selectedItem);
   }

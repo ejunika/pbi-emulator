@@ -7,6 +7,7 @@ import { IEmbedInfo, RoleType, TokenRI, ReportEvent, AppConfigChangeItem } from 
 import { AppUtilService } from '../app-util.service';
 import { Report } from 'report';
 import { ISlicerState, IBasicFilter } from 'powerbi-models';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-mainpanel',
@@ -26,7 +27,9 @@ export class MainpanelComponent implements OnInit {
   constructor(
     private localStorage: LocalStorage,
     private toasterService: ToasterService,
-    private appUtilService: AppUtilService
+    private appUtilService: AppUtilService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -94,6 +97,10 @@ export class MainpanelComponent implements OnInit {
             let powerbiService = this.appUtilService.getPowerBIService();
             let reportContainer = this.pbiContainer.nativeElement;
             if (reportContainer) {
+              this.router.navigate(['.'], {
+                relativeTo: this.activatedRoute,
+                queryParams: this.appUtilService.getQueryParams()
+              });
               powerbiService.reset(reportContainer);
               let report = <Report>powerbiService.embed(reportContainer, config);
               if (report) {

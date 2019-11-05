@@ -2,8 +2,9 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem, RoleType } from '../app-models';
 import { AppUtilService } from '../app-util.service';
+import { Router, Params } from '@angular/router';
 
 @Component({
   selector: 'app-leftpanel',
@@ -37,14 +38,15 @@ export class LeftpanelComponent implements OnInit {
     private appUtilService: AppUtilService,
     private groupService: GroupService,
     private toasterService: ToasterService,
-    private localStorage: LocalStorage
+    private localStorage: LocalStorage,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.selectedRole = <IRole>{};
     this.loadSettings();
     this.loadCopyBtnConfig();
     this.initRoles();
+    this.prepareRLS();
     this.initGroups();
     this.appUtilService.appConfigChangeNotifier
       .subscribe((appConfigChangeItem: AppConfigChangeItem) => {
@@ -62,7 +64,7 @@ export class LeftpanelComponent implements OnInit {
 
   loadCopyBtnConfig(): void {
     this.appUtilService.getItem('showCopyBtn')
-    .subscribe((flag: boolean) => this.showCopyBtn = flag);
+      .subscribe((flag: boolean) => this.showCopyBtn = flag);
   }
 
   loadSettings(): void {
@@ -93,35 +95,51 @@ export class LeftpanelComponent implements OnInit {
   }
 
   selectGroup(group: IGroup) {
-    this.selectedGroup = group;
-    this.initReports(group.id);
+    if (group) {
+      this.selectedGroup = group;
+      this.initReports(group.id);
+    }
   }
 
   selectReport(report: IReport) {
-    this.selectedReport = report;
-    this.isTakenOff = false;
+    if (report) {
+      this.selectedReport = report;
+      this.router.navigate(['go', this.selectedGroup.id, 'reports', this.selectedReport.id], {
+        queryParams: this.appUtilService.getQueryParams()
+      });
+      this.isTakenOff = false;
+    }
   }
 
   viewDashboard(): void {
     let embedInfo: IEmbedInfo = {
       group: this.selectedGroup,
       report: this.selectedReport,
-      applyRLS: this.applyRLS,
-      customData: this.applyRLS ? this.customData : '',
-      role: this.applyRLS ? this.selectedRole.dex : ''
+      applyRLS: this.appUtilService.appData.hasRLS,
+      customData: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.cd : '',
+      role: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.role : ''
     };
     this.embed.emit(embedInfo);
     this.isTakenOff = true;
   }
 
   initGroups(): void {
-    this.appUtilService.getGroups()
-      .subscribe((groups: Array<IGroup>) => {
-        this.groups = this.groupService.transform(groups);
-        if (this.groups.length > 0) {
-          this.disableDistrictSelector = false;
-        }
-      });
+    this.groups = this.groupService.getCachedGroup();
+    if (this.groupService.hasGroups) {
+      this.selectGroup(this.getSelectedGroup.call(this));
+      if (this.groups.length > 0) {
+        this.disableDistrictSelector = false;
+      }
+    } else {
+      this.appUtilService.getGroups()
+        .subscribe((groups: Array<IGroup>) => {
+          this.groups = this.groupService.transform(groups);
+          this.selectGroup(this.getSelectedGroup.call(this));
+          if (this.groups.length > 0) {
+            this.disableDistrictSelector = false;
+          }
+        });
+    }
   }
 
   updateDistrict(): void {
@@ -136,12 +154,36 @@ export class LeftpanelComponent implements OnInit {
     this.appUtilService.getReports(groupId)
       .subscribe((reports: Array<IReport>) => {
         this.reports = reports;
+        this.selectReport(this.getSelectedReport.call(this));
         if (this.reports.length > 0) {
           this.disableDashboardSelector = false;
+          if (this.selectedReport && this.selectedReport.id) {
+            this.router.navigate(['go', this.selectedGroup.id, 'reports', this.selectedReport.id], {
+              queryParams: this.appUtilService.getQueryParams()
+            });
+          } else {
+            this.router.navigate(['go', this.selectedGroup.id], {
+              queryParams: this.appUtilService.getQueryParams()
+            });
+          }
         } else {
           this.toasterService.pop('info', 'Reports', 'No report found in this district');
         }
       });
+  }
+
+  getSelectedGroup(): IGroup {
+    return this.groups.find((group: IGroup) => group.id === this.appUtilService.appData.currentGroupId);
+  }
+
+  getSelectedReport(): IReport {
+    return this.reports.find((report: IReport) => report.id === this.appUtilService.appData.currentReportId);
+  }
+
+  prepareRLS(): void {
+    this.applyRLS = this.appUtilService.appData.hasRLS;
+    this.customData = this.appUtilService.appData.cd;
+    this.selectedRole = this.roles.find((role: IRole) => role.dex === this.appUtilService.appData.role) || <IRole>{};
   }
 
 }
