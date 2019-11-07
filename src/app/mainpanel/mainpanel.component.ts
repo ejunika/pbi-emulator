@@ -8,6 +8,7 @@ import { AppUtilService } from '../app-util.service';
 import { Report } from 'report';
 import { ISlicerState, IBasicFilter } from 'powerbi-models';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Service } from 'service';
 
 @Component({
   selector: 'app-mainpanel',
@@ -94,24 +95,26 @@ export class MainpanelComponent implements OnInit {
             if (defaultPageName) {
               config.pageName = defaultPageName;
             }
-            let powerbiService = this.appUtilService.getPowerBIService();
-            let reportContainer = this.pbiContainer.nativeElement;
-            if (reportContainer) {
-              this.router.navigate(['.'], {
-                relativeTo: this.activatedRoute,
-                queryParams: this.appUtilService.getQueryParams()
+            this.appUtilService.getPowerBIService()
+              .subscribe((powerbiService: Service) => {
+                let reportContainer = this.pbiContainer.nativeElement;
+                if (reportContainer) {
+                  this.router.navigate(['.'], {
+                    relativeTo: this.activatedRoute,
+                    queryParams: this.appUtilService.getQueryParams()
+                  });
+                  powerbiService.reset(reportContainer);
+                  let report: Report = <Report>powerbiService.load(reportContainer, config);
+                  if (report) {
+                    window['report'] = report;
+                    const reportEvents: Array<ReportEvent> = [
+                      { name: 'rendered', handler: this.onReportRendered.bind(this, report) },
+                      { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }
+                    ];
+                    this.appUtilService.addEventsToReport(report, reportEvents);
+                  }
+                }
               });
-              powerbiService.reset(reportContainer);
-              let report = <Report>powerbiService.embed(reportContainer, config);
-              if (report) {
-                window['report'] = report;
-                const reportEvents: Array<ReportEvent> = [
-                  { name: 'rendered', handler: this.onReportRendered.bind(this, report) },
-                  { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }
-                ];
-                this.appUtilService.addEventsToReport(report, reportEvents);
-              }
-            }
           });
       });
   }
@@ -138,33 +141,31 @@ export class MainpanelComponent implements OnInit {
   }
 
   private onReportLoaded(report: Report, customEvent: CustomEvent): void {
-    console.log('Report Loaded');
-    setTimeout(() => {
-      report.getPages()
-        .then((pages: Array<Page>) => {
-          console.log('[Info]', pages);
-          let page = pages.find((page: Page) => page.name === 'ReportSectionTeacher' && page.isActive === true);
-          if (page) {
-            page.getVisuals().then((visuals: Array<VisualDescriptor>) => {
-              let slicerVisual = visuals.find((visual: VisualDescriptor) => visual.title === 'CalendarDateFilter');
-              if (slicerVisual) {
-                return slicerVisual.getSlicerState().then((state: ISlicerState) => {
-                  let monthFilter = <IBasicFilter>state.filters[0];
-                  if (monthFilter && monthFilter.values.indexOf('Sep-2019') === -1) {
-                    monthFilter.values = ['Sep-2019'];
-                    return slicerVisual.setSlicerState(state);
-                  } else {
-                    throw new Error(`Either the Slicer doesn't have filter or the filter is already applied`);
-                  }
-                });
-              }
-            });
-          } else {
-            throw new Error('NoSuchPageActiveError');
-          }
-        });
-      this.toasterService.pop('success', 'Reports', 'Report Loaded')
-    });
+    report.getPages()
+      .then((pages: Array<Page>) => {
+        console.log('[Info]', pages);
+        let page = pages.find((page: Page) => page.name === 'ReportSectionTeacher' && page.isActive === true);
+        if (page) {
+          page.getVisuals().then((visuals: Array<VisualDescriptor>) => {
+            let slicerVisual = visuals.find((visual: VisualDescriptor) => visual.title === 'CalendarDateFilter');
+            if (slicerVisual) {
+              return slicerVisual.getSlicerState().then((state: ISlicerState) => {
+                let monthFilter = <IBasicFilter>state.filters[0];
+                if (monthFilter && monthFilter.values.indexOf('Sep-2019') === -1) {
+                  monthFilter.values = ['Sep-2019'];
+                  return slicerVisual.setSlicerState(state);
+                } else {
+                  throw new Error(`Either the Slicer doesn't have filter or the filter is already applied`);
+                }
+              });
+            }
+          });
+        } else {
+          console.log('NoSuchPageActiveError');
+        }
+        report.render();
+      });
+    this.toasterService.pop('success', 'Reports', 'Report Loaded');
   }
 
 }

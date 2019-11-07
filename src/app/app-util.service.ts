@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { TokenRI, IGroup, GroupRI, IReport, ReportRI, AppData, AppConfigChangeItem, ReportEvent } from './app-models';
 import { DataService } from './data.service';
 import { map } from 'rxjs/operators/map';
-import { Subject } from 'rxjs';
+import { Subject, Observer } from 'rxjs';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { tap } from 'rxjs/operators';
 import { ToasterService } from 'angular2-toaster';
@@ -15,13 +15,15 @@ export class AppUtilService {
 
   powerbiService: service.Service;
   appData: AppData;
-  appConfigChangeNotifier: Subject<AppConfigChangeItem> = new Subject()
+  appConfigChangeNotifier: Subject<AppConfigChangeItem> = new Subject();
 
   constructor(
     private dataService: DataService,
     private toasterService: ToasterService,
     private localStorage: LocalStorage
-  ) { }
+  ) {
+    this.getPowerBIService().subscribe((powerbiService: service.Service) => this.powerbiService = powerbiService);
+  }
 
   alert(type: string, title: string, message: string): void {
     this.toasterService.pop(type, title, message);
@@ -44,11 +46,21 @@ export class AppUtilService {
     return this.localStorage.getItem(key);
   }
 
-  getPowerBIService(): service.Service {
-    if (!this.powerbiService) {
-      this.powerbiService = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
-    }
-    return this.powerbiService;
+  getPowerBIService(): Observable<service.Service> {
+    return new Observable<service.Service>((observer: Observer<service.Service>) => {
+      if (!this.powerbiService) {
+        let powerbiService = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
+        powerbiService.preload({
+          type: 'report',
+          embedUrl: 'https://app.powerbi.com/reportEmbed'
+        }).addEventListener('preloaded', () => {
+          this.powerbiService = powerbiService;
+          observer.next(this.powerbiService);
+        });
+      } else {
+        observer.next(this.powerbiService);
+      }
+    });
   }
 
   getReportEmbedToken(reqData: any, groupId: string, reportId: string): Observable<TokenRI> {
