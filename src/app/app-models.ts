@@ -39,6 +39,7 @@ export interface IReport {
 }
 
 export interface IEmbedInfo {
+    reportName?: string;
     group: IGroup;
     report: IReport;
     applyRLS: boolean;

@@ -17,13 +17,24 @@ import { Service } from 'service';
 })
 export class MainpanelComponent implements OnInit {
   @ViewChild('pbiContainer')
-  pbiContainer: ElementRef;
+  pbiContainerRef: ElementRef;
+
+  @ViewChild('performanceModal')
+  performanceModalRef: ElementRef;
 
   selectedStudents: Array<any>;
 
   countDownSeconds: number;
 
   showFilterPane: boolean;
+
+  currentReportPerformance: {
+    reportName?: string;
+    preload?: { [key: string]: Date };
+    tokenGeneration?: { [key: string]: Date };
+    loaded?: { [key: string]: Date };
+    rendered?: { [key: string]: Date };
+  } = {};
 
   constructor(
     private localStorage: LocalStorage,
@@ -54,20 +65,23 @@ export class MainpanelComponent implements OnInit {
     let group = embedInfo.group;
     let report = embedInfo.report;
     let applyRLS = embedInfo.applyRLS;
+    let reportName = embedInfo.reportName;
     let customData: string;
     let role: RoleType;
     if (applyRLS) {
       customData = embedInfo.customData;
       role = embedInfo.role;
     }
-    this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role);
+    this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role, reportName);
   }
 
-  embed(groupId: string, reportId: string, datasetId: string, embedUrl: string, applyRls?: boolean, customData?: string, role?: string): void {
+  embed(groupId: string, reportId: string, datasetId: string, embedUrl: string, applyRls?: boolean, customData?: string, role?: string, reportName?: string): void {
+    this.currentReportPerformance.reportName = reportName;
     this.localStorage.getItem('username')
       .subscribe((username: string) => {
         let settings: IEmbedSettings = {
-          filterPaneEnabled: this.showFilterPane
+          filterPaneEnabled: this.showFilterPane,
+          navContentPaneEnabled: true
         };
         let reqData: any = {
           accessLevel: 'view'
@@ -82,8 +96,13 @@ export class MainpanelComponent implements OnInit {
             }
           ];
         }
+        this.currentReportPerformance.tokenGeneration = {
+          startDate: new Date(),
+          endDate: null
+        };
         this.appUtilService.getReportEmbedToken(reqData, groupId, reportId)
           .subscribe((tokenRI: TokenRI) => {
+            this.currentReportPerformance.tokenGeneration.endDate = new Date();
             let config: IEmbedConfiguration = {
               type: 'report',
               accessToken: tokenRI.token,
@@ -97,13 +116,16 @@ export class MainpanelComponent implements OnInit {
             }
             this.appUtilService.getPowerBIService()
               .subscribe((powerbiService: Service) => {
-                let reportContainer = this.pbiContainer.nativeElement;
+                let reportContainer = this.pbiContainerRef.nativeElement;
                 if (reportContainer) {
                   this.router.navigate(['.'], {
                     relativeTo: this.activatedRoute,
                     queryParams: this.appUtilService.getQueryParams()
                   });
                   powerbiService.reset(reportContainer);
+                  this.currentReportPerformance.loaded = {
+                    startDate: new Date()
+                  };
                   let report: Report = <Report>powerbiService.load(reportContainer, config);
                   if (report) {
                     window['report'] = report;
@@ -137,35 +159,26 @@ export class MainpanelComponent implements OnInit {
   }
 
   private onReportRendered(report: Report, customEvent: CustomEvent): void {
-    console.log('Report Rendered');
+    this.currentReportPerformance.rendered.endDate = new Date();
+    this.analysePerformance();
   }
 
   private onReportLoaded(report: Report, customEvent: CustomEvent): void {
+    this.currentReportPerformance.loaded.endDate = new Date();
+    this.currentReportPerformance.rendered = {
+      startDate: new Date(),
+      endDate: null
+    };
     report.getPages()
       .then((pages: Array<Page>) => {
         console.log('[Info]', pages);
-        let page = pages.find((page: Page) => page.name === 'ReportSectionTeacher' && page.isActive === true);
-        if (page) {
-          page.getVisuals().then((visuals: Array<VisualDescriptor>) => {
-            let slicerVisual = visuals.find((visual: VisualDescriptor) => visual.title === 'CalendarDateFilter');
-            if (slicerVisual) {
-              return slicerVisual.getSlicerState().then((state: ISlicerState) => {
-                let monthFilter = <IBasicFilter>state.filters[0];
-                if (monthFilter && monthFilter.values.indexOf('Sep-2019') === -1) {
-                  monthFilter.values = ['Sep-2019'];
-                  return slicerVisual.setSlicerState(state);
-                } else {
-                  throw new Error(`Either the Slicer doesn't have filter or the filter is already applied`);
-                }
-              });
-            }
-          });
-        } else {
-          console.log('NoSuchPageActiveError');
-        }
         report.render();
       });
-    this.toasterService.pop('success', 'Reports', 'Report Loaded');
+    // this.toasterService.pop('success', 'Reports', 'Report Loaded');
+  }
+
+  private analysePerformance(): void {
+    $(this.performanceModalRef.nativeElement).appendTo('body').modal('show');
   }
 
 }

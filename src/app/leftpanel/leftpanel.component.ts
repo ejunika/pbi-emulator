@@ -117,7 +117,8 @@ export class LeftpanelComponent implements OnInit {
       report: this.selectedReport,
       applyRLS: this.appUtilService.appData.hasRLS,
       customData: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.cd : '',
-      role: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.role : ''
+      role: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.role : '',
+      reportName: this.selectedReport.name
     };
     this.embed.emit(embedInfo);
     this.isTakenOff = true;
