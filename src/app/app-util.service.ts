@@ -16,6 +16,10 @@ export class AppUtilService {
   powerbiService: service.Service;
   appData: AppData;
   appConfigChangeNotifier: Subject<AppConfigChangeItem> = new Subject();
+  preload: {
+    startDate: Date;
+    endDate: Date;
+  };
 
   constructor(
     private dataService: DataService,
@@ -50,10 +54,15 @@ export class AppUtilService {
     return new Observable<service.Service>((observer: Observer<service.Service>) => {
       if (!this.powerbiService) {
         let powerbiService = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
+        this.preload = {
+          startDate: new Date(),
+          endDate: null
+        };
         powerbiService.preload({
           type: 'report',
           embedUrl: 'https://app.powerbi.com/reportEmbed'
         }).addEventListener('preloaded', () => {
+          this.preload.endDate = new Date();
           this.powerbiService = powerbiService;
           observer.next(this.powerbiService);
         });

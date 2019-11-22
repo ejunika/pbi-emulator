@@ -72,6 +72,13 @@ export class MainpanelComponent implements OnInit {
       customData = embedInfo.customData;
       role = embedInfo.role;
     }
+    this.currentReportPerformance = {
+      preload: this.appUtilService.preload,
+      reportName: '',
+      tokenGeneration: {},
+      loaded: {},
+      rendered: {}
+    };
     this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role, reportName);
   }
 
@@ -96,10 +103,7 @@ export class MainpanelComponent implements OnInit {
             }
           ];
         }
-        this.currentReportPerformance.tokenGeneration = {
-          startDate: new Date(),
-          endDate: null
-        };
+        this.currentReportPerformance.tokenGeneration.startDate = new Date();
         this.appUtilService.getReportEmbedToken(reqData, groupId, reportId)
           .subscribe((tokenRI: TokenRI) => {
             this.currentReportPerformance.tokenGeneration.endDate = new Date();
@@ -123,9 +127,7 @@ export class MainpanelComponent implements OnInit {
                     queryParams: this.appUtilService.getQueryParams()
                   });
                   powerbiService.reset(reportContainer);
-                  this.currentReportPerformance.loaded = {
-                    startDate: new Date()
-                  };
+                  this.currentReportPerformance.loaded.startDate = new Date();
                   let report: Report = <Report>powerbiService.load(reportContainer, config);
                   if (report) {
                     window['report'] = report;
@@ -165,10 +167,7 @@ export class MainpanelComponent implements OnInit {
 
   private onReportLoaded(report: Report, customEvent: CustomEvent): void {
     this.currentReportPerformance.loaded.endDate = new Date();
-    this.currentReportPerformance.rendered = {
-      startDate: new Date(),
-      endDate: null
-    };
+    this.currentReportPerformance.rendered.startDate = new Date();
     report.getPages()
       .then((pages: Array<Page>) => {
         console.log('[Info]', pages);
