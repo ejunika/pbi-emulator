@@ -133,7 +133,8 @@ export class MainpanelComponent implements OnInit {
                     window['report'] = report;
                     const reportEvents: Array<ReportEvent> = [
                       { name: 'rendered', handler: this.onReportRendered.bind(this, report) },
-                      { name: 'loaded', handler: this.onReportLoaded.bind(this, report) }
+                      { name: 'loaded', handler: this.onReportLoaded.bind(this, report) },
+                      { name: 'pageChanged', handler: this.onReportPageChanged.bind(this, report) },
                     ];
                     this.appUtilService.addEventsToReport(report, reportEvents);
                   }
@@ -163,6 +164,10 @@ export class MainpanelComponent implements OnInit {
   private onReportRendered(report: Report, customEvent: CustomEvent): void {
     this.currentReportPerformance.rendered.endDate = new Date();
     this.analysePerformance();
+  }
+
+  private onReportPageChanged(report: Report, customEvent: CustomEvent): void {
+    this.currentReportPerformance.rendered.startDate = new Date();
   }
 
   private onReportLoaded(report: Report, customEvent: CustomEvent): void {

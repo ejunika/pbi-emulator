@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { AppData } from './app-models';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { map, tap, mergeMap, flatMap, first, switchMap, take } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { AppUtilService } from './app-util.service';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { of } from 'rxjs/observable/of';
@@ -20,7 +20,7 @@ export class AppResolverService implements Resolve<AppData> {
     private appUtilService: AppUtilService
   ) { }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppData> | Promise<AppData> | AppData {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppData> {
     const appData = new AppData();
     this.updateAppData(appData, route);
     return forkJoin([this.getTokenRemainingSeconds()
@@ -28,7 +28,7 @@ export class AppResolverService implements Resolve<AppData> {
         appData.countDownSeconds = countDownSeconds;
         this.appUtilService.appData = appData;
         return appData;
-      })), this.updateUsername()])
+      })), this.updateUsername(), this.appUtilService.getPowerBIService()])
       .pipe(map((finalRes: Array<any>) => {
         return finalRes[0];
       }));

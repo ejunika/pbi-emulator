@@ -9,6 +9,8 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 import { tap } from 'rxjs/operators';
 import { ToasterService } from 'angular2-toaster';
 import { Params } from '@angular/router';
+import { ObserveOnOperator } from 'rxjs/operators/observeOn';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable()
 export class AppUtilService {
@@ -24,10 +26,9 @@ export class AppUtilService {
   constructor(
     private dataService: DataService,
     private toasterService: ToasterService,
-    private localStorage: LocalStorage
-  ) {
-    this.getPowerBIService().subscribe((powerbiService: service.Service) => this.powerbiService = powerbiService);
-  }
+    private localStorage: LocalStorage,
+    private spinnerService: NgxSpinnerService
+  ) { }
 
   alert(type: string, title: string, message: string): void {
     this.toasterService.pop(type, title, message);
@@ -58,13 +59,17 @@ export class AppUtilService {
           startDate: new Date(),
           endDate: null
         };
+        this.spinnerService.show();
         powerbiService.preload({
           type: 'report',
           embedUrl: 'https://app.powerbi.com/reportEmbed'
         }).addEventListener('preloaded', () => {
           this.preload.endDate = new Date();
+          this.toasterService.pop('info', 'Engine', `Preloading completed in ${(this.preload.endDate.getTime() - this.preload.startDate.getTime()) / 1000} Second(s)`);
           this.powerbiService = powerbiService;
           observer.next(this.powerbiService);
+          this.spinnerService.hide();
+          observer.complete();
         });
       } else {
         observer.next(this.powerbiService);
