@@ -73,6 +73,7 @@ export class AppUtilService {
         });
       } else {
         observer.next(this.powerbiService);
+        observer.complete();
       }
     });
   }
