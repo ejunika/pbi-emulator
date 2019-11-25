@@ -2,7 +2,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem, TokenRI } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 import { Router } from '@angular/router';
 
@@ -120,7 +120,48 @@ export class LeftpanelComponent implements OnInit {
       role: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.role : '',
       reportName: this.selectedReport.name
     };
-    this.embed.emit(embedInfo);
+    this.appUtilService.getEmbedTokenForAll({
+      datasets: [
+        {
+          id: 'fd70ae41-bedf-4dd3-b91c-d84382c9a3c5'
+        },
+        {
+          id: '54bb4f9e-5418-4237-8391-c0a42fd3fa29'
+        },
+        {
+          id: 'f82a02a7-19cb-47e6-b402-df7f75380dde'
+        }
+      ],
+      // identities: [
+      //   {
+      //     customData: '+dihHijeg68vIQpG3WJKZA==',
+      //     datasets: ['bbebdbfd-4948-4a21-a47b-67f636087f9e', '68662378-c24e-4a5a-a6a3-c72d4c9e84a4'],
+      //     reports: ['e8e1fe8f-5b89-47bb-b46b-4c2e96a5ad37', '9899edff-8d78-4d34-84ea-4dd738dff3c8'],
+      //     roles: ['Teacher'],
+      //     username: '00UIAD1PBIPRO@powerschool.cloud'
+      //   }
+      // ],
+      reports: [
+        {
+          id: '36760b6a-166d-497c-943f-dac7d3c14023'
+        },
+        {
+          id: 'b7f966ca-2d0d-409e-a1a6-adf866567cc5'
+        },
+        {
+          id: '88bccbe5-b8c3-4f55-98d1-98f1d560f93b'
+        }
+      ],
+      targetWorkspaces: [
+        {
+          id: '2542fc34-a10b-4cef-b7cf-7bb1b525f458'
+        }
+      ]
+    }).subscribe((tokenRI: TokenRI) => {
+      embedInfo.embedToken = tokenRI.token;
+      this.embed.emit(embedInfo);
+    });
+    // this.embed.emit(embedInfo);
     this.isTakenOff = true;
   }
 

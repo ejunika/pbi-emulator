@@ -82,6 +82,10 @@ export class AppUtilService {
     return this.dataService.post(reqData, 'myorg', ['groups', groupId, 'reports', reportId, 'GenerateToken']);
   }
 
+  getEmbedTokenForAll(reqData: any): Observable<TokenRI> {
+    return this.dataService.post(reqData, 'myorg', ['GenerateToken']);
+  }
+
   getGroups(): Observable<Array<IGroup>> {
     return this.dataService.get<GroupRI>('myorg', ['groups'])
       .pipe(map((groupRI: GroupRI) => {
@@ -103,6 +107,14 @@ export class AppUtilService {
         report.on(event.name, event.handler);
       });
     }
+  }
+
+  getRandomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  getRandomArbitrary(min: number, max: number): number {
+    return Math.random() * (max - min) + min;
   }
 
   getQueryParams(): Params {

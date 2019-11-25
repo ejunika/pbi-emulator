@@ -45,6 +45,7 @@ export interface IEmbedInfo {
     applyRLS: boolean;
     customData: string;
     role: RoleType;
+    embedToken?: string;
 }
 
 export interface IRole {
@@ -71,6 +72,6 @@ export interface AppConfigChangeItem {
 }
 
 export interface ReportEvent {
-    name: string;
+    name: 'rendered' | 'loaded' | 'pageChanged';
     handler: (...args: Array<any>) => void;
 }
