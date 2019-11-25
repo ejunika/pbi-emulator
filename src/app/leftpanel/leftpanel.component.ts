@@ -5,6 +5,7 @@ import { LocalStorage } from '@ngx-pwa/local-storage';
 import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 import { Router } from '@angular/router';
+import { clone } from 'lodash';
 
 @Component({
   selector: 'app-leftpanel',
@@ -30,6 +31,18 @@ export class LeftpanelComponent implements OnInit {
   rlsEnabled: boolean;
   isTakenOff: boolean = false;
   showCopyBtn: boolean = false;
+
+  ontimeEmbedTokenPayload: {
+    reports: Array<{ id: string }>;
+    datasets: Array<{ id: string }>;
+    targetWorkspaces: Array<{ id: string }>;
+    identities?: Array<{
+      customData: string;
+      username: string;
+      datasets: Array<string>;
+      roles: Array<string>;
+    }>;
+  };
 
   @Output()
   embed: EventEmitter<IEmbedInfo> = new EventEmitter();
@@ -97,6 +110,11 @@ export class LeftpanelComponent implements OnInit {
   selectGroup(group: IGroup) {
     if (group) {
       this.selectedGroup = group;
+      this.ontimeEmbedTokenPayload = {
+        targetWorkspaces: [{ id: this.selectedGroup.id }],
+        reports: [],
+        datasets: []
+      };
       this.initReports(group.id);
     }
   }
@@ -154,6 +172,13 @@ export class LeftpanelComponent implements OnInit {
     this.disableDashboardSelector = true;
     this.appUtilService.getReports(groupId)
       .subscribe((reports: Array<IReport>) => {
+        let reportsClone = clone(reports);
+        this.ontimeEmbedTokenPayload.reports = reportsClone.map((report: IReport) => {
+          return { id: report.id };
+        });
+        this.ontimeEmbedTokenPayload.datasets = reportsClone.map((report: IReport) => {
+          return { id: report.datasetId };
+        });
         this.reports = reports;
         this.selectReport(this.getSelectedReport.call(this));
         if (this.reports.length > 0) {
