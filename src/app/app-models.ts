@@ -45,6 +45,7 @@ export interface IEmbedInfo {
     applyRLS: boolean;
     customData: string;
     role: RoleType;
+    tokenRI?: TokenRI;
 }
 
 export interface IRole {

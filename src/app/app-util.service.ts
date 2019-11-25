@@ -51,26 +51,31 @@ export class AppUtilService {
     return this.localStorage.getItem(key);
   }
 
-  getPowerBIService(): Observable<service.Service> {
+  getPowerBIService(isPreloadNeeded?: boolean): Observable<service.Service> {
     return new Observable<service.Service>((observer: Observer<service.Service>) => {
       if (!this.powerbiService) {
         let powerbiService = new service.Service(factories.hpmFactory, factories.wpmpFactory, factories.routerFactory);
-        this.preload = {
-          startDate: new Date(),
-          endDate: null
-        };
-        this.spinnerService.show();
-        powerbiService.preload({
-          type: 'report',
-          embedUrl: 'https://app.powerbi.com/reportEmbed'
-        }).addEventListener('preloaded', () => {
-          this.preload.endDate = new Date();
-          this.toasterService.pop('info', 'Engine', `Preloading completed in ${(this.preload.endDate.getTime() - this.preload.startDate.getTime()) / 1000} Second(s)`);
-          this.powerbiService = powerbiService;
-          observer.next(this.powerbiService);
-          this.spinnerService.hide();
+        if (isPreloadNeeded) {
+          this.preload = {
+            startDate: new Date(),
+            endDate: null
+          };
+          this.spinnerService.show();
+          powerbiService.preload({
+            type: 'report',
+            embedUrl: 'https://app.powerbi.com/reportEmbed'
+          }).addEventListener('preloaded', () => {
+            this.preload.endDate = new Date();
+            this.toasterService.pop('info', 'Engine', `Preloading completed in ${(this.preload.endDate.getTime() - this.preload.startDate.getTime()) / 1000} Second(s)`);
+            this.powerbiService = powerbiService;
+            observer.next(this.powerbiService);
+            this.spinnerService.hide();
+            observer.complete();
+          });
+        } else {
+          observer.next(powerbiService);
           observer.complete();
-        });
+        }
       } else {
         observer.next(this.powerbiService);
         observer.complete();
@@ -80,6 +85,10 @@ export class AppUtilService {
 
   getReportEmbedToken(reqData: any, groupId: string, reportId: string): Observable<TokenRI> {
     return this.dataService.post(reqData, 'myorg', ['groups', groupId, 'reports', reportId, 'GenerateToken']);
+  }
+
+  getOneTimeembedToken(reqData: any): Observable<TokenRI> {
+    return this.dataService.post(reqData, 'myorg', ['GenerateToken']);
   }
 
   getGroups(): Observable<Array<IGroup>> {

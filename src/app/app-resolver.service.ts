@@ -28,7 +28,7 @@ export class AppResolverService implements Resolve<AppData> {
         appData.countDownSeconds = countDownSeconds;
         this.appUtilService.appData = appData;
         return appData;
-      })), this.updateUsername(), this.appUtilService.getPowerBIService()])
+      })), this.updateUsername(), this.appUtilService.getPowerBIService(true)])
       .pipe(map((finalRes: Array<any>) => {
         return finalRes[0];
       }));

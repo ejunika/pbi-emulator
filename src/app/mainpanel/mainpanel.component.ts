@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { models, Page, VisualDescriptor } from 'powerbi-client';
-import { IEmbedConfiguration, IEmbedSettings } from 'embed';
+import { IEmbedConfiguration, IEmbedSettings, IBootstrapEmbedConfiguration } from 'embed';
 import { LocalStorage } from '@ngx-pwa/local-storage';
 import { ToasterService } from 'angular2-toaster';
 import { IEmbedInfo, RoleType, TokenRI, ReportEvent, AppConfigChangeItem } from '../app-models';
@@ -10,6 +10,7 @@ import { ISlicerState, IBasicFilter } from 'powerbi-models';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Service } from 'service';
 
+let _this: MainpanelComponent;
 @Component({
   selector: 'app-mainpanel',
   templateUrl: './mainpanel.component.html',
@@ -28,6 +29,8 @@ export class MainpanelComponent implements OnInit {
 
   showFilterPane: boolean;
 
+  report: Report;
+
   currentReportPerformance: {
     reportName?: string;
     preload?: { [key: string]: Date };
@@ -42,7 +45,7 @@ export class MainpanelComponent implements OnInit {
     private appUtilService: AppUtilService,
     private router: Router,
     private activatedRoute: ActivatedRoute
-  ) { }
+  ) { _this = this; }
 
   ngOnInit(): void {
     this.selectedStudents = [];
@@ -58,6 +61,18 @@ export class MainpanelComponent implements OnInit {
               this.showFilterPane = showFilterPane;
             });
         }
+      });
+    // this.bootstrapPowerbi();
+  }
+
+  bootstrapPowerbi(): void {
+    this.appUtilService.getPowerBIService()
+      .subscribe((powerbiService: Service) => {
+        let bootstrapConfig: IBootstrapEmbedConfiguration = {
+          type: 'report',
+          hostname: 'https://app.powerbi.com'
+        };
+        powerbiService.bootstrap(this.pbiContainerRef.nativeElement, bootstrapConfig);
       });
   }
 
@@ -79,7 +94,47 @@ export class MainpanelComponent implements OnInit {
       loaded: {},
       rendered: {}
     };
-    this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role, reportName);
+    this.embedWithOneTimeEmbedToken(report.embedUrl, embedInfo.tokenRI.token);
+    // this.embed(group.id, report.id, report.datasetId, report.embedUrl, applyRLS, customData, role, reportName);
+  }
+
+  embedWithOneTimeEmbedToken(embedUrl: string, embedToken: string): void {
+    let settings: IEmbedSettings = {
+      filterPaneEnabled: this.showFilterPane,
+      navContentPaneEnabled: true
+    };
+    this.currentReportPerformance.tokenGeneration.endDate = new Date();
+    let config: IEmbedConfiguration = {
+      type: 'report',
+      accessToken: embedToken,
+      embedUrl: embedUrl,
+      tokenType: models.TokenType.Embed,
+      settings: settings
+    };
+    let defaultPageName = this.getDefaultPageName();
+    if (defaultPageName) {
+      config.pageName = defaultPageName;
+    }
+    this.appUtilService.getPowerBIService()
+      .subscribe((powerbiService: Service) => {
+        let reportContainer = this.pbiContainerRef.nativeElement;
+        if (reportContainer) {
+          this.router.navigate(['.'], {
+            relativeTo: this.activatedRoute,
+            queryParams: this.appUtilService.getQueryParams()
+          });
+          this.currentReportPerformance.loaded.startDate = new Date();
+          this.report = <Report>powerbiService.embed(reportContainer, config);
+          if (this.report) {
+            const reportEvents: Array<ReportEvent> = [
+              { name: 'rendered', handler: this.onReportRendered },
+              { name: 'loaded', handler: this.onReportLoaded },
+              { name: 'pageChanged', handler: this.onReportPageChanged },
+            ];
+            this.appUtilService.addEventsToReport(this.report, reportEvents);
+          }
+        }
+      });
   }
 
   embed(groupId: string, reportId: string, datasetId: string, embedUrl: string, applyRls?: boolean, customData?: string, role?: string, reportName?: string): void {
@@ -161,24 +216,22 @@ export class MainpanelComponent implements OnInit {
     return 'badge-' + classes[this.getRandomInt(0, 7)];
   }
 
-  private onReportRendered(report: Report, customEvent: CustomEvent): void {
-    this.currentReportPerformance.rendered.endDate = new Date();
-    this.analysePerformance();
+  private onReportRendered(customEvent: CustomEvent): void {
+    _this.currentReportPerformance.rendered.endDate = new Date();
+    _this.analysePerformance();
   }
 
-  private onReportPageChanged(report: Report, customEvent: CustomEvent): void {
-    this.currentReportPerformance.rendered.startDate = new Date();
+  private onReportPageChanged(customEvent: CustomEvent): void {
+    _this.currentReportPerformance.rendered.startDate = new Date();
   }
 
-  private onReportLoaded(report: Report, customEvent: CustomEvent): void {
-    this.currentReportPerformance.loaded.endDate = new Date();
-    this.currentReportPerformance.rendered.startDate = new Date();
-    report.getPages()
+  private onReportLoaded(customEvent: CustomEvent): void {
+    _this.currentReportPerformance.loaded.endDate = new Date();
+    _this.currentReportPerformance.rendered.startDate = new Date();
+    _this.report.getPages()
       .then((pages: Array<Page>) => {
         console.log('[Info]', pages);
-        report.render();
       });
-    // this.toasterService.pop('success', 'Reports', 'Report Loaded');
   }
 
   private analysePerformance(): void {

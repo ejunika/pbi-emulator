@@ -2,10 +2,10 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { GroupService } from '../group.service';
 import { ToasterService } from 'angular2-toaster';
 import { LocalStorage } from '@ngx-pwa/local-storage';
-import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem } from '../app-models';
+import { IEmbedInfo, IReport, IGroup, IRole, AppConfigChangeItem, TokenRI } from '../app-models';
 import { AppUtilService } from '../app-util.service';
 import { Router } from '@angular/router';
-import { clone } from 'lodash';
+import { clone, uniqBy } from 'lodash';
 
 @Component({
   selector: 'app-leftpanel',
@@ -32,10 +32,12 @@ export class LeftpanelComponent implements OnInit {
   isTakenOff: boolean = false;
   showCopyBtn: boolean = false;
 
+  oneTimeEmbedToken: TokenRI;
+
   ontimeEmbedTokenPayload: {
     reports: Array<{ id: string }>;
     datasets: Array<{ id: string }>;
-    targetWorkspaces: Array<{ id: string }>;
+    targetWorkspaces?: Array<{ id: string }>;
     identities?: Array<{
       customData: string;
       username: string;
@@ -110,11 +112,6 @@ export class LeftpanelComponent implements OnInit {
   selectGroup(group: IGroup) {
     if (group) {
       this.selectedGroup = group;
-      this.ontimeEmbedTokenPayload = {
-        targetWorkspaces: [{ id: this.selectedGroup.id }],
-        reports: [],
-        datasets: []
-      };
       this.initReports(group.id);
     }
   }
@@ -138,7 +135,17 @@ export class LeftpanelComponent implements OnInit {
       role: this.appUtilService.appData.hasRLS ? this.appUtilService.appData.role : '',
       reportName: this.selectedReport.name
     };
-    this.embed.emit(embedInfo);
+    if (this.oneTimeEmbedToken) {
+      embedInfo.tokenRI = this.oneTimeEmbedToken;
+      this.embed.emit(embedInfo);
+    } else {
+      this.appUtilService.getOneTimeembedToken(this.ontimeEmbedTokenPayload)
+        .subscribe((tokenRI: TokenRI) => {
+          this.oneTimeEmbedToken = tokenRI;
+          embedInfo.tokenRI = this.oneTimeEmbedToken;
+          this.embed.emit(embedInfo);
+        });
+    }
     this.isTakenOff = true;
   }
 
@@ -173,12 +180,14 @@ export class LeftpanelComponent implements OnInit {
     this.appUtilService.getReports(groupId)
       .subscribe((reports: Array<IReport>) => {
         let reportsClone = clone(reports);
-        this.ontimeEmbedTokenPayload.reports = reportsClone.map((report: IReport) => {
-          return { id: report.id };
-        });
-        this.ontimeEmbedTokenPayload.datasets = reportsClone.map((report: IReport) => {
-          return { id: report.datasetId };
-        });
+        this.ontimeEmbedTokenPayload = {
+          reports: uniqBy(reportsClone.map((report: IReport) => {
+            return { id: report.id };
+          }), (item: IReport) => item.id),
+          datasets: uniqBy(reportsClone.map((report: IReport) => {
+            return { id: report.datasetId };
+          }), (item: IReport) => item.id)
+        };
         this.reports = reports;
         this.selectReport(this.getSelectedReport.call(this));
         if (this.reports.length > 0) {
