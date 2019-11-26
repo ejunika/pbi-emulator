@@ -200,7 +200,7 @@ export class MainpanelComponent implements OnInit {
   }
 
   getDefaultPageName(): string {
-    return 'ReportSectionTeacher';
+    return '';
   }
 
   getRandomInt(min: number, max: number): number {

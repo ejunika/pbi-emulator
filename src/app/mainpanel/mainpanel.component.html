@@ -34,7 +34,7 @@
                                         {{ (currentReportPerformance?.preload?.endDate - currentReportPerformance?.preload?.startDate) / 1000 + ' Second(s)' }}
                                     </td>
                                 </tr>
-                                <tr>
+                                <!-- <tr>
                                     <td>Token Generation</td>
                                     <td>{{ currentReportPerformance?.tokenGeneration?.startDate | date : 'medium' }}
                                     </td>
@@ -42,7 +42,7 @@
                                     <td>
                                         {{ (currentReportPerformance?.tokenGeneration?.endDate - currentReportPerformance?.tokenGeneration?.startDate) / 1000 + ' Second(s)' }}
                                     </td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td>Loading</td>
                                     <td>{{ currentReportPerformance?.loaded?.startDate | date : 'medium' }}</td>
@@ -63,8 +63,7 @@
                                     <td colspan="3"><strong>Total Time</strong></td>
                                     <td>
                                         {{
-                                            ((currentReportPerformance?.tokenGeneration?.endDate - currentReportPerformance?.tokenGeneration?.startDate)
-                                            + (currentReportPerformance?.loaded?.endDate - currentReportPerformance?.loaded?.startDate)
+                                            ((currentReportPerformance?.loaded?.endDate - currentReportPerformance?.loaded?.startDate)
                                             + (currentReportPerformance?.rendered?.endDate - currentReportPerformance?.rendered?.startDate)) / 1000 + ' Second(s)'
                                         }}
                                     </td>
@@ -73,7 +72,8 @@
                         </table>
                         <p class="card-text">
                             <strong>Note: </strong>
-                            Preloading time is not included in total time because it happens only once before starting the application.
+                            Preloading time is not included in total time because it happens only once before starting
+                            the application.
                         </p>
                     </div>
                 </div>
