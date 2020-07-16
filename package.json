@@ -36,7 +36,7 @@
     "express": "^4.17.1",
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
-    "lodash": "4.17.5",
+    "lodash": "4.17.19",
     "ngx-spinner": "^2.0.1",
     "papaparse": "^4.5.0",
     "powerbi-client": "^2.8.0",
